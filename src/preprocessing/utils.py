@@ -52,6 +52,7 @@ def stratified_split(df, label_col, train_ratio=0.8, val_ratio=0.1, nfolds = 10,
   groups, group_counts = distribute_labels(poly_smiles[2:], label_counts[2:], target_per_group = test_len, n_groups = nfolds)
 
   output_list = list()
+  label_counts_list = list()
   for i in range(nfolds):
     test_c = leftover_df[leftover_df[label_col].isin(groups[i])]
     test_c = test_c.reset_index(drop=True)
@@ -73,19 +74,20 @@ def stratified_split(df, label_col, train_ratio=0.8, val_ratio=0.1, nfolds = 10,
     train_c = pd.concat([OCC_df,curr_train_c], ignore_index = True)
 
     output_list.append((train_c,val_c,test_c))
-    label_counts = train_c["monomer_smiles"].nunique(),val_c["monomer_smiles"].nunique(),test_c["monomer_smiles"].nunique()
+    label_counts = train_c[label_col].nunique(),val_c[label_col].nunique(),test_c[label_col].nunique()
+    label_counts_list.append(label_counts)
 
     if verbose:
       print("target vals:", train_len,val_len,test_len)
       print("final vals:",len(train_c),len(val_c),len(test_c))
       print("Unique labels:",label_counts)
-  return output_list
+  return output_list, label_counts_list
 
-def add_fingerprint_cols(df,fpSize, polymer_use_fp, salt_use_fp):
+def add_fingerprint_cols(df,fpSize, polymer_use_fp, salt_use_fp, tokeniser,model):
   if polymer_use_fp == "morgan":
      df = smiles_to_fingerprint(df, "long_smiles",fpSize=fpSize)
   if polymer_use_fp == "polybert":
-     df = smiles_to_polyBERT(df, "psmiles")
+     df = smiles_to_polyBERT(df, "psmiles", tokeniser=tokeniser, model=model)
   if salt_use_fp == "morgan":
      df = smiles_to_fingerprint(df,col_name="salt smiles",fpSize=fpSize)
   return df
@@ -102,6 +104,6 @@ def standardise(x_train:pd.DataFrame,x_val:pd.DataFrame,x_test:pd.DataFrame, con
 def xy_split(x: pd.DataFrame,
              y_label:str="conductivity") -> Tuple[pd.DataFrame | pd.Series]:
 
-    x,y = x.drop(columns = [y_label,"temperature","monomer_smiles"]), x[y_label]
+    x,y = x.drop(columns = [y_label]), x[y_label]
 
     return x,y

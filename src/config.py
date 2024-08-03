@@ -7,11 +7,11 @@ data_cleaning = {
 preprocessing = {
   "data_dir_name": "data",
   "input_data_name": "cleaned_data.xlsx",
-  "output_data_name": "split_data.pickle",
-  "label_col": "smiles",
-  "cats": ["smiles","salt smiles"],
+  "output_data_name": "morgan_xgb_128.pickle",
+  "label_col": "long_smiles",
+  "cats": ["long_smiles","salt smiles"],
   "conts": ["mw","molality", "temperature_K"],
-  "drop_columns": [],
+  "drop_columns": ["smiles","raw_psmiles","psmiles","temperature"],
   "train_ratio":0.8,
   "val_ratio":0.1,
   "nfolds": 10,
@@ -24,8 +24,8 @@ preprocessing = {
 xgb_cv = {
   "data_dir_name": "data",
   "results_dir_name": "results",
-  "input_data_name": "split_data.pickle",
-  "output_name": "xgb_chemarr_minus_top2monomers_replicate.csv",
+  "input_data_name": "polyBERT_xgb_128.pickle",
+  "output_name": "xgb_polyBERT.csv",
   "seed_list":[42,3,34,43,83], 
   "verbose": True
 }

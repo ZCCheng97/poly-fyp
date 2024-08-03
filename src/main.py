@@ -3,11 +3,11 @@ import config as config_module
 from args import get_args
 
 from data_cleaning.data_cleaning import data_cleaning
-# from preprocessing.preprocessing import preprocessing
+from preprocessing.preprocessing import preprocessing
 from train.xgb_cv import xgb_cv
 
 step_funcs = {"data_cleaning": data_cleaning,
-            #   "preprocessing": preprocessing,
+              "preprocessing": preprocessing,
               "xgb_cv": xgb_cv}
 
 def main():

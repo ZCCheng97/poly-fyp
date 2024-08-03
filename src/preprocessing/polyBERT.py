@@ -1,13 +1,11 @@
 import torch
-from transformers import AutoTokenizer, AutoModel
 
 from .fingerprinting import array_to_cols
 
-def smiles_to_polyBERT(df,col_name):
+def smiles_to_polyBERT(df,col_name, tokeniser, model):
   df = df.copy()
   device = "cuda" if torch.cuda.is_available() else "cpu"
-  tokeniser = AutoTokenizer.from_pretrained('kuelumbus/polyBERT')
-  model = AutoModel.from_pretrained('kuelumbus/polyBERT')
+  
   model.to(device)
 
   def mean_pooling(model_output, attention_mask):
