@@ -1,4 +1,6 @@
 from .utils import * 
+from pathlib import Path
+import pandas as pd
 
 def data_cleaning(args):
   script_dir = Path(__file__).resolve().parent
@@ -10,6 +12,8 @@ def data_cleaning(args):
   df = pd.read_csv(csv_dir)
   new_df = df \
   .pipe(add_long_smiles)\
+  .pipe(add_raw_psmiles)\
+  .pipe(add_psmiles)\
   .pipe(fill_salt_with_Li)\
   .pipe(fill_molality)\
   .pipe(fill_mw)\

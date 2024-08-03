@@ -1,11 +1,8 @@
-from pathlib import Path
 import numpy as np
-import pandas as pd
-from rdkit import Chem
-from rdkit.Chem import MolFromSmiles, MolToSmiles, AllChem, rdFingerprintGenerator
+from rdkit.Chem import MolFromSmiles, MolToSmiles, AllChem
 from rdkit.Chem.Lipinski import HeavyAtomCount
-import rdkit
 import math
+from psmiles import PolymerSmiles as PS
 
 def create_long_smiles(smile, req_length):
     # check if smile is a polymer
@@ -53,33 +50,47 @@ def create_long_smiles(smile, req_length):
 
 def add_long_smiles(df, req_length = 30):
   df = df.copy()
-  df["monomer_smiles"] = df["smiles"]
-  smiles = df["smiles"].value_counts().index
+  df["long_smiles"] = df["smiles"]
+  smiles = df["long_smiles"].value_counts().index
 
   for smile in smiles:
       if isinstance(smile, str):
-          idx = df.index[df["smiles"] == smile].tolist()
+          idx = df.index[df["long_smiles"] == smile].tolist()
           long_smile = create_long_smiles(smile, req_length)
-          df.loc[idx, "smiles"] = long_smile
+          df.loc[idx, "long_smiles"] = long_smile
   return df
+
+def add_raw_psmiles(df):
+  df = df.copy()
+  df["raw_psmiles"] = df["smiles"].apply(lambda x: x.replace("[Cu]", "[*]").replace("[Au]", "[*]"))
+  return df
+
+def add_psmiles(df):
+   df = df.copy()
+   df["psmiles"] = df["raw_psmiles"].apply(lambda x: str(PS(x).canonicalize))
+   return df
 
 def remove_all_na(df):
   df = df.copy()
   df = df.dropna()
   return df
+
 def fill_salt_with_Li(df):
   df = df.copy()
-  df["salt smiles"].fillna("[Li+]", inplace=True)
+  df["salt smiles"] = df["salt smiles"].fillna("[Li+]")
   return df
+
 def fill_molality(df):
   df = df.copy()
-  df.loc[:, "molality"].fillna(0, inplace=True)
+  df["molality"] = df["molality"].fillna(0)
   return df
+
 def fill_mw(df):
   df = df.copy()
-  df.loc[:, "mw"].fillna(65000, inplace=True)
-  df.loc[:, "mw"] = np.log10(df["mw"])
+  df["mw"] = df["mw"].fillna(65000)
+  df["mw"] = df["mw"].apply(lambda x: np.log10(x))
   return df
+
 def add_temperature_K(df):
   df = df.copy()
   df["temperature_K"] = df.temperature.apply(lambda x: x+273)
