@@ -4,12 +4,13 @@ import numpy as np
 from scipy.stats import spearmanr
 import csv
 from tqdm import tqdm
+import wandb
 
-def regression_model(fold, seed_list = [42], verbose = True):
+def xgb(fold, seed_list = [42], verbose = True, params: dict = dict()):
   funcs = [mean_absolute_error,mean_squared_error, spearmanr,r2_score]
   outputs = []
   for seed in tqdm(seed_list, desc= "Seed"):
-    model = XGBRegressor(seed = seed, subsample = 0.8)
+    model = XGBRegressor(seed = seed, subsample = 0.8) if not params else XGBRegressor(seed = seed,**params)
     model.fit(fold.x_train,fold.y_train)
     y_pred = model.predict(fold.x_test)
     res = [func(fold.y_test,y_pred) if func != spearmanr else func(fold.y_test,y_pred).statistic for func in funcs]
@@ -22,7 +23,8 @@ def regression_model(fold, seed_list = [42], verbose = True):
       print(f"{func.__name__}: {res_mean[funcs.index(func)]}")
   return res_mean, res_std
 
-def logger(data_dict:dict, csv_file_path:str):
+def logger(data_dict:dict, csv_file_path:str, use_wandb: bool= False):
+  if use_wandb: wandb.log(data_dict)
   file_exists = False
   try:
     with open(csv_file_path, 'r') as csvfile:
@@ -38,3 +40,5 @@ def logger(data_dict:dict, csv_file_path:str):
         writer.writeheader()
 
     writer.writerow(data_dict)
+
+    

@@ -2,8 +2,9 @@ import pickle
 from tqdm import tqdm
 from pathlib import Path
 import numpy as np
+import wandb
 
-from .utils import regression_model, logger
+from .utils import xgb, logger
 
 def xgb_cv(args):
   script_dir = Path(__file__).resolve().parent
@@ -21,9 +22,19 @@ def xgb_cv(args):
 
   for fold in tqdm(range(nfolds)):
     print(f"Currently running fold: {fold}")
+
+    if args.use_wandb: 
+      project = args.output_name.split(".")[0]
+
+      wandb.init(
+            project=project, 
+            name=f"Fold {fold}", 
+            config=args.as_dictionary)  
+      # args = wandb.config
+
     datasplit = data[fold] # object of DataSplit class.
 
-    res_mean,res_std = regression_model(datasplit, seed_list = args.seed_list, verbose = args.verbose)
+    res_mean,res_std = xgb(datasplit, seed_list = args.seed_list, verbose = args.verbose)
     data_dict = {
         "fold": fold,
         "mae_mean": res_mean[0],
@@ -41,8 +52,10 @@ def xgb_cv(args):
         "val_labels": datasplit.label_counts[1],
         "test_labels": datasplit.label_counts[2]
     }
-    logger(data_dict, output_path)
+    logger(data_dict, output_path, args.use_wandb)
     fold_means.append(res_mean)
+    if args.use_wandb: wandb.finish()
+
   mean_of_fold_means = np.mean(np.array(fold_means),axis = 0)
   stds_of_fold_means = np.std(np.array(fold_means),axis = 0)
 
@@ -59,5 +72,7 @@ def xgb_cv(args):
         "spearman_mean": stds_of_fold_means[2],
         "r2_mean": stds_of_fold_means[3]}
   
-  logger(mean_dict, output_path)
-  logger(std_dict, output_path)
+  logger(mean_dict, output_path, use_wandb=False)
+  logger(std_dict, output_path, use_wandb=False)
+
+  

@@ -31,7 +31,9 @@ def categorify(df:pd.DataFrame, cats:List[str]) -> pd.DataFrame:
 
     return model_df
 
-def stratified_split(df, label_col, train_ratio=0.8, val_ratio=0.1, nfolds = 10,verbose = True):
+def stratified_split(df, train_ratio=0.8, val_ratio=0.1, nfolds = 10,verbose = True):
+  label_col = "smiles"
+
   df_c_len = len(df)
   train_ratio = int(train_ratio*10)
   val_ratio = int(val_ratio*10)
@@ -73,9 +75,12 @@ def stratified_split(df, label_col, train_ratio=0.8, val_ratio=0.1, nfolds = 10,
     curr_train_c = curr_leftover[curr_leftover[label_col].isin(unique_labels)]
     train_c = pd.concat([OCC_df,curr_train_c], ignore_index = True)
 
-    output_list.append((train_c,val_c,test_c))
     label_counts = train_c[label_col].nunique(),val_c[label_col].nunique(),test_c[label_col].nunique()
+    train_c,val_c, test_c = train_c.drop(columns = label_col),val_c.drop(columns = label_col),test_c.drop(columns = label_col)
+
+    output_list.append((train_c,val_c,test_c))
     label_counts_list.append(label_counts)
+    
 
     if verbose:
       print("target vals:", train_len,val_len,test_len)

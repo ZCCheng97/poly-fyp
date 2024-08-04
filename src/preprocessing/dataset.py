@@ -25,7 +25,7 @@ class TabularDataset:
       tokeniser = None
       model = None
       
-    df_list, label_counts_list = stratified_split(self.df, label_col = args.label_col, train_ratio=args.train_ratio, val_ratio=args.val_ratio, nfolds = args.nfolds,verbose = args.verbose)
+    df_list, label_counts_list = stratified_split(self.df, train_ratio=args.train_ratio, val_ratio=args.val_ratio, nfolds = args.nfolds,verbose = args.verbose)
     for fold in tqdm(range(args.nfolds), desc = "Curr Fold"):
       train_df, val_df, test_df = df_list[fold]
 
