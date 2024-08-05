@@ -4,7 +4,7 @@ import pandas as pd
 
 from .dataset import TabularDataset
 
-def preprocessing(args):
+def preprocess_xgb(args):
   script_dir = Path(__file__).resolve().parent
 
   data_dir = script_dir.parent.parent / args.data_dir_name

@@ -3,15 +3,17 @@ import config as config_module
 from args import get_args
 
 from data_cleaning.data_cleaning import data_cleaning
-from preprocessing.preprocessing import preprocessing
-from train.xgb_cv import xgb_cv
-from train.xgb_sweep import xgb_sweep
+from preprocessing.preprocess_xgb import preprocess_xgb
+from preprocessing.preprocess_ffn import preprocess_ffn
+from train_xgb.xgb_cv import xgb_cv
+from train_xgb.xgb_sweep import xgb_sweep
 
 import wandb
 import os
 
 step_funcs = {"data_cleaning": data_cleaning,
-              "preprocessing": preprocessing,
+              "preprocess_xgb": preprocess_xgb,
+              "preprocess_ffn": preprocess_ffn,
               "xgb_cv": xgb_cv,
               "xgb_sweep": xgb_sweep,
               }

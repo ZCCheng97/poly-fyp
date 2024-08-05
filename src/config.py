@@ -4,29 +4,45 @@ data_cleaning = {
     "cleaned_data_name": "cleaned_data.xlsx" # should be saved as a xlsx file
 }
 
-preprocessing = {
+preprocess_xgb = {
   "data_dir_name": "data",
   "input_data_name": "cleaned_data.xlsx",
-  "output_data_name": "polyBERT_xgb.pickle",
-  "cats": ["psmiles","salt smiles"],
+  "output_data_name": "morgan_xgb_128.pickle",
+  "cats": ["long_smiles","salt smiles"],
   "conts": ["mw","molality", "temperature_K"],
-  "drop_columns": ["raw_psmiles","long_smiles","temperature"],
+  "drop_columns": ["raw_psmiles","psmiles","temperature"],
   "train_ratio":0.8,
   "val_ratio":0.1,
   "nfolds": 10,
-  "polymer_use_fp": "polybert", # {"polybert", "morgan", "none"}
+  "polymer_use_fp": "morgan", # {"polybert", "morgan", "none"}
   "salt_use_fp": "morgan", # {"morgan", chemprop?}
   "fpSize": 128,
-  "verbose":True
+  "verbose":False
+}
+
+preprocess_ffn = {
+  "data_dir_name": "data",
+  "input_data_name": "cleaned_data.xlsx",
+  "output_data_name": "morgan_ffn_128.pickle",
+  "train_ratio":0.8,
+  "val_ratio":0.1,
+  "nfolds": 10,
+  "text_col": "psmiles",
+  "salt_col": "salt smiles",
+  "conts": ["mw","molality", "temperature_K"],
+  "transformer_name": 'kuelumbus/polyBERT',
+  "salt_encoding": "morgan", # {"morgan", chemprop?}
+  "fpSize": 128,
+  "verbose":False
 }
 
 xgb_cv = {
   "use_wandb" : True,
-  "best_params": "zccheng97-nanyang-technological-university-singapore/xgb_poly_hpsweep/2p05zvwu", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>"
+  "best_params": "", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>"
   "data_dir_name": "data",
   "results_dir_name": "results",
-  "input_data_name": "polyBERT_xgb.pickle",
-  "output_name": "xgb_polyBERT_colSMILES_best.csv",
+  "input_data_name": "morgan_xgb_128.pickle",
+  "output_name": "xgb_morgan_colSMILES.csv",
   "seed_list":[42,3,34,43,83], 
   "verbose": True,
 }
@@ -34,8 +50,8 @@ xgb_cv = {
 xgb_sweep = {
   "data_dir_name": "data",
   "results_dir_name": "results",
-  "input_data_name": "polyBERT_xgb.pickle",
-  "output_name": "xgb_poly_hpsweep.csv",
+  "input_data_name": "morgan_xgb_128.pickle",
+  "output_name": "xgb_morgan_hpsweep.csv",
   "seed_list":[42], 
   "params":{"n_estimators": 200,
         "max_depth": 3,
@@ -83,12 +99,13 @@ xgb_sweep = {
         }
     }
 },
-  "verbose": True,
+  "verbose": False,
 
 }
 
 step_args = {
        'data_cleaning': data_cleaning,
-       'preprocessing': preprocessing,
+       'preprocess_xgb': preprocess_xgb,
+       'preprocess_ffn':preprocess_ffn,
        "xgb_cv": xgb_cv,
        "xgb_sweep": xgb_sweep}

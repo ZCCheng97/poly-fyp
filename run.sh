@@ -1,3 +1,3 @@
 cd src
 
-python main.py xgb_cv
+python main.py preprocess_ffn
