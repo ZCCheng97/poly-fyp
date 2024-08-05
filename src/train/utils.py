@@ -10,7 +10,7 @@ def xgb(fold, seed_list = [42], verbose = True, params: dict = dict()):
   funcs = [mean_absolute_error,mean_squared_error, spearmanr,r2_score]
   outputs = []
   for seed in tqdm(seed_list, desc= "Seed"):
-    model = XGBRegressor(seed = seed, subsample = 0.8) if not params else XGBRegressor(seed = seed,**params)
+    model = XGBRegressor(seed = seed, subsample = 0.8) if not params else XGBRegressor(seed = seed, subsample = 0.8,**params)
     model.fit(fold.x_train,fold.y_train)
     y_pred = model.predict(fold.x_test)
     res = [func(fold.y_test,y_pred) if func != spearmanr else func(fold.y_test,y_pred).statistic for func in funcs]
@@ -41,4 +41,13 @@ def logger(data_dict:dict, csv_file_path:str, use_wandb: bool= False):
 
     writer.writerow(data_dict)
 
+def load_best_params(best_params:str="", verbose: bool=False) -> dict:
+  params = dict()
+  if best_params: # loads best params from wandb API if provided path.
+    api = wandb.Api()
+    sweep = api.sweep(best_params)
+    best_run = sweep.best_run()
+    params = best_run.config
+    if verbose: print(params)
+  return params
     

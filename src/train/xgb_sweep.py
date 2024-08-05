@@ -23,13 +23,14 @@ def xgb_sweep(args):
       fold_means = list()
       
       wandb.init(config=args.as_dictionary)
+      wandb_config = wandb.config
 
       for fold in tqdm(range(nfolds)):
             print(f"Currently running fold: {fold}")
 
             datasplit = data[fold] # object of DataSplit class.
 
-            res_mean, _= xgb(datasplit, seed_list = args.seed_list, verbose = args.verbose, params = args.params)
+            res_mean, _= xgb(datasplit, seed_list = args.seed_list, verbose = args.verbose, params = wandb_config)
             fold_means.append(res_mean)
 
       mean_of_fold_means = np.mean(np.array(fold_means),axis = 0)

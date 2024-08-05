@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import wandb
 
-from .utils import xgb, logger
+from .utils import xgb, logger, load_best_params
 
 def xgb_cv(args):
   script_dir = Path(__file__).resolve().parent
@@ -30,11 +30,11 @@ def xgb_cv(args):
             project=project, 
             name=f"Fold {fold}", 
             config=args.as_dictionary)  
-      # args = wandb.config
 
     datasplit = data[fold] # object of DataSplit class.
+    params = load_best_params(args.best_params, verbose = args.verbose)
 
-    res_mean,res_std = xgb(datasplit, seed_list = args.seed_list, verbose = args.verbose)
+    res_mean,res_std = xgb(datasplit, seed_list = args.seed_list, verbose = args.verbose, params=params)
     data_dict = {
         "fold": fold,
         "mae_mean": res_mean[0],
