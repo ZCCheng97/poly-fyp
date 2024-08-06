@@ -108,12 +108,12 @@ ffn_cv = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "morgan_ffn_128.pickle",
-  "output_name": "ffn_morgan_hpsweep",
+  "output_name": "ffn_morgan_hpsweep", # remember to not include .csv for this particular variable, used to name the model file also
   "fold_list":[0], 
   "seed": 42,
   "device": "cuda",
-  "batch_size": 32,
-  "accumulation_steps":4,
+  "batch_size": 16,
+  "accumulation_steps":8,
   "chemberta_model_name": 'kuelumbus/polyBERT',
   "use_salt_encoder": False,
   "num_polymer_features": 600,
@@ -128,7 +128,7 @@ ffn_cv = {
   "freeze_layers": 12,
   "lr": 1e-4,
   "epochs": 100,
-  "use_wandb" : False,
+  "use_wandb" : True,
   }
 
 step_args = {

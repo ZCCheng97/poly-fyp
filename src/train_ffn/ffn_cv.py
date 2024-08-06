@@ -17,8 +17,6 @@ def ffn_cv(args):
     results_dir = script_dir.parent.parent / args.results_dir_name
     models_dir = script_dir.parent.parent / args.models_dir_name
     input_data_path = data_dir / args.input_data_name
-    output_log_path = results_dir / f"{args.output_name}.csv"
-    output_model_path = models_dir / f"{args.output_name}.pt"
 
     with open(input_data_path, 'rb') as f:
         data = pickle.load(f) # object of list of Datasplit Classes
@@ -26,7 +24,8 @@ def ffn_cv(args):
     torch.cuda.empty_cache()
     seed_everything(args.seed)
     for fold in tqdm(args.fold_list):
-        
+        output_log_path = results_dir / f"{args.output_name}_fold{fold}.csv"
+        output_model_path = models_dir / f"{args.output_name}_fold{fold}.pt"
         print(f"Currently running fold: {fold}")
 
         if args.use_wandb: 
