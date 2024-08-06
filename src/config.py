@@ -103,9 +103,38 @@ xgb_sweep = {
 
 }
 
+ffn_cv = {
+  "data_dir_name": "data",
+  "results_dir_name": "results",
+  "models_dir_name": "models",
+  "input_data_name": "morgan_ffn_128.pickle",
+  "output_name": "ffn_morgan_hpsweep",
+  "fold_list":[0], 
+  "seed": 42,
+  "device": "cuda",
+  "batch_size": 32,
+  "accumulation_steps":4,
+  "chemberta_model_name": 'kuelumbus/polyBERT',
+  "use_salt_encoder": False,
+  "num_polymer_features": 600,
+  "num_salt_features": 128,
+  "num_continuous_vars": 3,
+  "hidden_size": 1024,
+  "num_hidden_layers": 1,
+  "dropout": 0.1,
+  # "activation_fn": nn.ReLU,
+  # "init_method": None,
+  "output_size": 1,
+  "freeze_layers": 12,
+  "lr": 1e-4,
+  "epochs": 100,
+  "use_wandb" : False,
+  }
+
 step_args = {
        'data_cleaning': data_cleaning,
        'preprocess_xgb': preprocess_xgb,
        'preprocess_ffn':preprocess_ffn,
        "xgb_cv": xgb_cv,
-       "xgb_sweep": xgb_sweep}
+       "xgb_sweep": xgb_sweep,
+       "ffn_cv": ffn_cv}

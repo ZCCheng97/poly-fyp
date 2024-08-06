@@ -81,7 +81,6 @@ def stratified_split(df, train_ratio=0.8, val_ratio=0.1, nfolds = 10,verbose = T
     output_list.append((train_c,val_c,test_c))
     label_counts_list.append(label_counts)
     
-
     if verbose:
       print("target vals:", train_len,val_len,test_len)
       print("final vals:",len(train_c),len(val_c),len(test_c))
