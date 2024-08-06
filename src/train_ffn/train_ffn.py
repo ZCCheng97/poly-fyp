@@ -25,16 +25,17 @@ def train_ffn(torchsplit_dict,args, trained_model_path, log_csv_path) -> float:
                     #  init_method=args.init_method, 
                      output_size=args.output_size,
                      freeze_layers=args.freeze_layers)
+    model.to(args.device)
     criterion = nn.L1Loss()
     optimizer = torch.optim.AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=5)
 
     elapsed_epochs = 0
     current_best_loss = np.inf
-
     if os.path.exists(trained_model_path):
+        print(f"Model found at location: {trained_model_path}")
         print("Loading from checkpoint...")
-        cp = torch.load(trained_model_path)
+        cp = torch.load(trained_model_path, map_location=args.device)
         model.load_state_dict(cp["model_state_dict"])
         optimizer.load_state_dict(cp["optimizer_state_dict"])
         scheduler.load_state_dict(cp["scheduler_state_dict"])

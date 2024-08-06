@@ -109,7 +109,7 @@ ffn_cv = {
   "models_dir_name": "models",
   "input_data_name": "morgan_ffn_128.pickle",
   "output_name": "ffn_morgan_hpsweep", # remember to not include .csv for this particular variable, used to name the model file also
-  "fold_list":[0], 
+  "fold_list":[1,2], 
   "seed": 42,
   "device": "cuda",
   "batch_size": 16,
@@ -127,7 +127,7 @@ ffn_cv = {
   "output_size": 1,
   "freeze_layers": 12,
   "lr": 1e-4,
-  "epochs": 100,
+  "epochs": 20,
   "use_wandb" : True,
   }
 
