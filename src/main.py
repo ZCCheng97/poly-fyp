@@ -21,7 +21,7 @@ step_funcs = {"data_cleaning": data_cleaning,
               }
 
 def main():
-    wandb.login(key=os.environ["WANDB_API_KEY"])
+    # wandb.login(key=os.environ["WANDB_API_KEY"])
 
     parser = argparse.ArgumentParser(description='Run pipeline steps.')
     parser.add_argument('steps', nargs='+', help='List of steps to run')

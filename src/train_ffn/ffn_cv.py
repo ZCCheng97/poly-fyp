@@ -37,6 +37,6 @@ def ffn_cv(args):
                     config=args.as_dictionary)  
 
         datasplit = data[fold] # object of DataSplit class.
-
+        
         res = train_ffn(datasplit, args, output_model_path,output_log_path)
     
