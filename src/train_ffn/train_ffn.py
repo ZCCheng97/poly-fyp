@@ -25,6 +25,7 @@ def train_ffn(torchsplit_dict,args, trained_model_path, log_csv_path) -> float:
                     #  init_method=args.init_method, 
                      output_size=args.output_size,
                      freeze_layers=args.freeze_layers)
+    model.to(args.device)
     criterion = nn.L1Loss()
     optimizer = torch.optim.AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=5)

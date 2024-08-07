@@ -11,7 +11,6 @@ class Engine:
 
     def __call__(self, train_dataloader, val_dataloader):
         train_loss, val_loss = 0.0,0.0
-        self.model.to(self.device)
 
         self.model.train()
         # Zero the parameter gradients
