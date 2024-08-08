@@ -25,8 +25,8 @@ def train_ffn(tabularsplit,args, trained_model_path, log_csv_path) -> float:
                      hidden_size=args.hidden_size, 
                      num_hidden_layers=args.num_hidden_layers, 
                      dropout=args.dropout, 
-                    #  activation_fn=args.activation_fn, 
-                    #  init_method=args.init_method, 
+                     activation_fn=args.activation_fn, 
+                     init_method=args.init_method, 
                      output_size=args.output_size,
                      freeze_layers=args.freeze_layers)
     model.to(args.device)

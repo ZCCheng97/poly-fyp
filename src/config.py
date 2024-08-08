@@ -116,24 +116,86 @@ ffn_cv = {
   "fold_list":[1,2,3,4,5,6,7,8,9], 
   "seed": 42,
   "device": "cuda",
-  "batch_size": 16,
-  "accumulation_steps":8,
   "chemberta_model_name": 'kuelumbus/polyBERT',
   "use_salt_encoder": False,
   "num_polymer_features": 600,
   "num_salt_features": 128,
   "num_continuous_vars": 3,
+  # tunable hyperparameters
+  "batch_size": 16, # cannot exceed 32 atm due to memory limits
+  "accumulation_steps":8,
   "hidden_size": 1024,
   "num_hidden_layers": 1,
   "dropout": 0.1,
-  # "activation_fn": nn.ReLU,
-  # "init_method": None,
+  "activation_fn": "relu",
+  "init_method": "glorot",
   "output_size": 1,
   "freeze_layers": 12,
   "lr": 1e-4,
   "epochs": 20,
   "use_wandb" : True,
+  # optimiser coming soon
+  # scheduler coming soon
   }
+
+ffn_sweep = {
+  "data_dir_name": "data",
+  "results_dir_name": "results",
+  "models_dir_name": "models",
+  "input_data_name": "morgan_xgb_128.pickle",
+  "output_name": "ffn_morgan_hpsweep_LR_BS_NUMLAYERS",
+  "salt_col": "salt smiles",
+  "salt_encoding": "morgan",
+  "conts": ["mw","molality", "temperature_K"],
+  "seed":42, 
+  "device": "cuda",
+  "chemberta_model_name": 'kuelumbus/polyBERT',
+  "use_salt_encoder": False,
+  "num_polymer_features": 600,
+  "num_salt_features": 128,
+  "num_continuous_vars": 3,
+  "sweep_config":{
+    "method": "bayes", # try grid or random or bayes
+    "metric": {
+      "name": "mae_mean",
+      "goal": "minimize"   
+    },
+    "parameters": {
+        "n_estimators": {
+            "distribution":"int_uniform",
+            "min": 100,
+            "max":2000
+        },
+        "max_depth": {
+            "distribution":"int_uniform",
+            "min": 5,
+            "max": 50
+        },
+        "learning_rate": {
+            "distribution":"uniform",
+            "min": 0.01,
+            "max": 1.0
+        },
+        'reg_lambda':{
+          "distribution":"log_uniform_values",
+          "min": 1e-9,
+          "max": 10.0
+        },
+        'reg_alpha':{
+          "distribution":"log_uniform_values",
+          "min": 1e-9,
+          "max": 10.0
+        },
+        'gamma':{
+          "distribution":"uniform",
+          "min": 1e-9,
+          "max": 10.0
+        }
+    }
+},
+  "verbose": False,
+
+}
 
 step_args = {
        'data_cleaning': data_cleaning,

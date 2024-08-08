@@ -4,13 +4,15 @@ from transformers import AutoModel
 
 class FFNModel(nn.Module):
     def __init__(self, chemberta_model_name, use_salt_encoder, num_polymer_features,num_salt_features, num_continuous_vars, 
-                 hidden_size = 2048, num_hidden_layers=2, dropout = 0.1, activation_fn=nn.ReLU(), init_method=None, output_size = 1,freeze_layers=None):
+                 hidden_size = 2048, num_hidden_layers=2, dropout = 0.1, activation_fn="relu", init_method="glorot", output_size = 1,freeze_layers=None):
         super(FFNModel, self).__init__()
         self.polymerencoder = PolymerEncoder(chemberta_model_name, freeze_layers=freeze_layers)
         self.saltencoder = SaltEncoder(use_encoder=use_salt_encoder)
         self.input_dim  = num_polymer_features + num_salt_features + num_continuous_vars
+        self.activation_fn = pick_activation(activation_fn)
+        self.init_method = init_method
 
-        self.create_ffn(self.input_dim, num_hidden_layers, hidden_size, activation_fn, dropout, output_size)
+        self.create_ffn(self.input_dim, num_hidden_layers, hidden_size, self.activation_fn, dropout, output_size)
 
     def create_ffn(self, input_dim, num_hidden_layers, hidden_size, activation_fn, dropout, output_size):
         dropout = nn.Dropout(dropout)
@@ -26,19 +28,19 @@ class FFNModel(nn.Module):
             ]
             for _ in range(num_hidden_layers-1):
                 ffn.extend([
-                    activation_fn,
+                    activation_fn(),
                     dropout,
                     nn.Linear(hidden_size, hidden_size),
                 ])
             ffn.extend([
-                activation_fn,
+                activation_fn(),
                 dropout,
                 nn.Linear(hidden_size,output_size),
             ])
 
         # Create FFN model
         self.ffn = nn.Sequential(*ffn)
-        initialize_weights(self.ffn)
+        initialize_weights(self.ffn, init_method=self.init_method)
 
         # Initialize weights if an initialization method is provided
         
@@ -76,7 +78,7 @@ class PolymerEncoder(nn.Module):
         pooled_output = self.mean_pooling(outputs, attention_mask)
         return pooled_output
 
-# Example autoencoder (for demonstration purposes)
+# Currently use_encoder is always passed in as false
 class SaltEncoder(nn.Module):
     def __init__(self,input_dim=10, hidden_dim=5,use_encoder = False):
         super(SaltEncoder, self).__init__()
@@ -96,14 +98,19 @@ class SaltEncoder(nn.Module):
         else:
             return self.identity_layer(x)
 
-def initialize_weights(model: nn.Module) -> None:
+def initialize_weights(model: nn.Module, init_method:str = "glorot") -> None:
     """
     Initializes the weights of a model in place.
 
     :param model: An PyTorch model.
     """
+    intialisations_d = {"glorot": nn.init.xavier_normal_}
     for param in model.parameters():
         if param.dim() == 1:
             nn.init.constant_(param, 0)
         else:
-            nn.init.xavier_normal_(param)
+            intialisations_d[init_method](param)
+
+def pick_activation(activation_fn:str = "relu"):
+    activations_d = {"relu": nn.ReLU}
+    return activations_d[activation_fn]
