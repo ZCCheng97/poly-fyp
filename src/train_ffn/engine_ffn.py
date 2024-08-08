@@ -1,5 +1,41 @@
 import torch
 from tqdm import tqdm
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+import numpy as np
+from scipy.stats import spearmanr
+
+class Tester:
+    def __init__(self, model, device):
+        self.model = model
+        self.device = device
+        self.funcs = [mean_absolute_error,mean_squared_error, spearmanr,r2_score]
+    
+    def __call__(self, test_dataloader):
+        scores = list()
+        self.model.eval()
+        with torch.no_grad():
+            for batch in tqdm(test_dataloader, desc="Test batch", total=len(test_dataloader)):
+                text_input = batch['input_ids'].squeeze(1) 
+                attention_mask = batch['attention_mask'].squeeze(1)
+                salt_input = batch['salt_embedding']
+                continuous_vars = batch['continuous_vars']
+                labels = batch['label_var']
+
+                # Move tensors to device
+                text_input = text_input.to(self.device) 
+                attention_mask = attention_mask.to(self.device)
+                salt_input = salt_input.to(self.device)
+                continuous_vars = continuous_vars.to(self.device)
+                labels = labels.to(self.device)
+
+                # Forward pass
+                outputs = self.model(text_input, attention_mask, salt_input, continuous_vars)
+                scores.append(np.array([func(outputs,labels) if func != spearmanr else func(outputs,labels).statistic for func in self.funcs]))
+            
+        scores = np.array(scores).mean(axis = 0)
+        print(len(scores))
+        return scores
+
 
 class Engine:
     def __init__(self, model, criterion, optimizer, device, accumulation_steps):
