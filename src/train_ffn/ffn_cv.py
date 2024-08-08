@@ -19,7 +19,7 @@ def ffn_cv(args):
     input_data_path = data_dir / args.input_data_name
 
     with open(input_data_path, 'rb') as f:
-        data = pickle.load(f) # object of list of Datasplit Classes
+        data = pickle.load(f) # object of list of TabularSplit Classes
 
     torch.cuda.empty_cache()
     seed_everything(args.seed)
@@ -36,7 +36,7 @@ def ffn_cv(args):
                     name=f"Fold {fold}", 
                     config=args.as_dictionary)  
 
-        datasplit = data[fold] # object of DataSplit class.
+        datasplit = data[fold] # object of TabularSplit class.
         
         res = train_ffn(datasplit, args, output_model_path,output_log_path)
     

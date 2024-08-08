@@ -1,5 +1,4 @@
 from pandas import DataFrame
-from .utils import stratified_split, add_fingerprint_cols, standardise, xy_split
 from typing import List
 from tqdm import tqdm
 import torch
@@ -8,63 +7,27 @@ from transformers import AutoTokenizer, AutoModel
 from rdkit.Chem import rdFingerprintGenerator
 from rdkit import Chem
 
-class TorchSplit(Dataset): # must already take in standardised dataframe split
-    def __init__(self, df: DataFrame,text_col, salt_col, conts, transformer_name:str = 'kuelumbus/polyBERT', salt_encoding:str="morgan", fpSize: int = 128):
-        self.tokeniser = AutoTokenizer.from_pretrained(transformer_name)
-        self.fpSize = fpSize
-        self.salt_encoding = salt_encoding
-        self.df = df
-        
-        self.text_col = text_col
-        self.salt_col = salt_col
-        self.conts = conts
-        self.label_counts = df[text_col].nunique()
-        
-
-    def __len__(self):
-        return len(self.df)
-    
-    def __getitem__(self, idx):
-        text = self.df[self.text_col].iloc[idx]
-        salt_text = self.df[self.salt_col].iloc[idx]
-        continuous_vars = self.df[self.conts].iloc[idx]
-        label_var = self.df["conductivity"].iloc[idx]
-        
-        # Tokenize the text sequence
-        encoded_text = self.tokeniser(text,max_length = 512,return_tensors='pt', padding="max_length", truncation=True)
-        
-        # Process the second sequence using the autoencoder
-        if self.salt_encoding == "morgan":
-           self.salt_encoder = rdFingerprintGenerator.GetMorganGenerator(radius=3,fpSize=self.fpSize) \
-                             .GetFingerprint(Chem.MolFromSmiles(salt_text))
-        salt_embedding = torch.tensor(self.salt_encoder,dtype=torch.float32)
-        
-        # Convert continuous variables to tensor
-        continuous_vars_tensor = torch.tensor(continuous_vars.values, dtype=torch.float32)
-
-        label_vars_tensor = torch.tensor(label_var, dtype=torch.float32).unsqueeze(0)
-        
-        # Return a dictionary of the encoded inputs
-        return {
-            'encoded_text': encoded_text,
-            'salt_embedding': salt_embedding,
-            'continuous_vars': continuous_vars_tensor,
-            "label_var": label_vars_tensor
-        }
+from .fingerprinting import add_fingerprint_cols
+from .tensorify import smiles_to_tokens, smiles_to_fpbinary
+from .utils import stratified_split, standardise, xy_split
 
 class TorchDataset:
   def __init__(self,df:DataFrame):
       self.df = df
       self.folds = list()
 
-  def process(self,args) -> List[TorchSplit]:
-    df_list, _ = stratified_split(self.df, train_ratio=args.train_ratio, val_ratio=args.val_ratio, nfolds = args.nfolds,verbose = args.verbose)
+  def process(self,args) -> List[dict]:
+    tokeniser = AutoTokenizer.from_pretrained(args.transformer_name)
+    self.df = smiles_to_tokens(self.df, args.text_col,tokeniser)
+    self.df = smiles_to_fpbinary(self.df, args.salt_col, args.fpSize)
+
+    df_list, label_counts_list = stratified_split(self.df, train_ratio=args.train_ratio, val_ratio=args.val_ratio, nfolds = args.nfolds,verbose = args.verbose)
     for fold in tqdm(range(args.nfolds), desc = "Curr Fold"):
       train_df, val_df, test_df = df_list[fold]
       train_df, val_df, test_df = standardise(train_df, val_df, test_df, conts = args.conts)
-      self.folds.append({"train": TorchSplit(train_df, args.text_col,args.salt_col, args.conts, args.transformer_name, args.salt_encoding, args.fpSize),
-                         "val": TorchSplit(val_df, args.text_col,args.salt_col, args.conts, args.transformer_name, args.salt_encoding, args.fpSize),
-                         "test":TorchSplit(test_df, args.text_col,args.salt_col, args.conts, args.transformer_name, args.salt_encoding, args.fpSize),})
+
+      curr_fold = TabularSplit(train_df,val_df,test_df, label_counts = label_counts_list[fold])
+      self.folds.append(curr_fold)
     return self.folds
 
 class TabularSplit:
@@ -102,4 +65,3 @@ class TabularDataset:
 
       self.folds.append(curr_fold)
     return self.folds
-

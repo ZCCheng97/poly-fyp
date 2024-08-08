@@ -4,9 +4,6 @@ from typing import List,Tuple
 
 from sklearn.preprocessing import StandardScaler
 
-from .fingerprinting import array_to_cols, smiles_to_fingerprint
-from .polyBERT import smiles_to_polyBERT 
-
 def distribute_labels(labels, counts, target_per_group=820, n_groups=10):
     # Combine labels and counts into a list of tuples and sort by count descending
     label_counts = sorted(zip(labels, counts), key=lambda x: x[1], reverse=True)
@@ -31,7 +28,7 @@ def categorify(df:pd.DataFrame, cats:List[str]) -> pd.DataFrame:
 
     return model_df
 
-def stratified_split(df, train_ratio=0.8, val_ratio=0.1, nfolds = 10,verbose = True):
+def stratified_split(df, train_ratio=0.8, val_ratio=0.1, nfolds = 10,verbose = True) -> List[Tuple[pd.DataFrame]]:
   label_col = "smiles"
 
   df_c_len = len(df)
@@ -86,15 +83,6 @@ def stratified_split(df, train_ratio=0.8, val_ratio=0.1, nfolds = 10,verbose = T
       print("final vals:",len(train_c),len(val_c),len(test_c))
       print("Unique labels:",label_counts)
   return output_list, label_counts_list
-
-def add_fingerprint_cols(df,fpSize, polymer_use_fp, salt_use_fp, tokeniser,model):
-  if polymer_use_fp == "morgan":
-     df = smiles_to_fingerprint(df, "long_smiles",fpSize=fpSize)
-  if polymer_use_fp == "polybert":
-     df = smiles_to_polyBERT(df, "psmiles", tokeniser=tokeniser, model=model)
-  if salt_use_fp == "morgan":
-     df = smiles_to_fingerprint(df,col_name="salt smiles",fpSize=fpSize)
-  return df
 
 def standardise(x_train:pd.DataFrame,x_val:pd.DataFrame,x_test:pd.DataFrame, conts:List[str]) -> Tuple[pd.DataFrame]:
     scaler = StandardScaler()

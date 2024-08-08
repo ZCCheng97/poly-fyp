@@ -109,7 +109,10 @@ ffn_cv = {
   "models_dir_name": "models",
   "input_data_name": "morgan_ffn_128.pickle",
   "output_name": "ffn_morgan_hpsweep", # remember to not include .csv for this particular variable, used to name the model file also
-  "fold_list":[1,2], 
+  "salt_col": "salt smiles",
+  "salt_encoding": "morgan",
+  "conts": ["mw","molality", "temperature_K"],
+  "fold_list":[1,2,3,4,5,6,7,8,9], 
   "seed": 42,
   "device": "cuda",
   "batch_size": 16,

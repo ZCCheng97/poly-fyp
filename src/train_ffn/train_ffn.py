@@ -8,10 +8,14 @@ import os
 from .utils import logger
 from .engine_ffn import Engine
 from .model import FFNModel
+from .dataset import FFNDataset
 
-def train_ffn(torchsplit_dict,args, trained_model_path, log_csv_path) -> float:
-    train_loader = DataLoader(torchsplit_dict["train"], batch_size=args.batch_size, shuffle=True)
-    val_loader = DataLoader(torchsplit_dict["val"], batch_size=args.batch_size)
+def train_ffn(tabularsplit,args, trained_model_path, log_csv_path) -> float:
+    train_dataset = FFNDataset(tabularsplit.x_train,tabularsplit.y_train,args)
+    val_dataset = FFNDataset(tabularsplit.x_val,tabularsplit.y_val,args)
+
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=args.batch_size)
     
     model = FFNModel(chemberta_model_name= args.chemberta_model_name, 
                      use_salt_encoder=args.use_salt_encoder, 

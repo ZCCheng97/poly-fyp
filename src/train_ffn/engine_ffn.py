@@ -16,8 +16,8 @@ class Engine:
         # Zero the parameter gradients
         self.optimizer.zero_grad()
         for i, batch in enumerate(tqdm(train_dataloader, desc="Training batch", total=len(train_dataloader))):
-            text_input = batch['encoded_text']['input_ids'].squeeze(1)  # Adjust as necessary
-            attention_mask = batch['encoded_text']['attention_mask'].squeeze(1)
+            text_input = batch['input_ids'].squeeze(1) 
+            attention_mask = batch['attention_mask'].squeeze(1)
             salt_input = batch['salt_embedding']
             continuous_vars = batch['continuous_vars']
             labels = batch['label_var']
@@ -46,11 +46,12 @@ class Engine:
 
         with torch.no_grad():
             for batch in tqdm(val_dataloader, desc="Validation batch", total=len(val_dataloader)):
-                text_input = batch['encoded_text']['input_ids'].squeeze(1)  # Adjust as necessary
-                attention_mask = batch['encoded_text']['attention_mask'].squeeze(1)
+                text_input = batch['input_ids'].squeeze(1) 
+                attention_mask = batch['attention_mask'].squeeze(1)
                 salt_input = batch['salt_embedding']
                 continuous_vars = batch['continuous_vars']
                 labels = batch['label_var']
+
 
                 # Move tensors to device
                 text_input = text_input.to(self.device) 
