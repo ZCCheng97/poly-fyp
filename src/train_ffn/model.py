@@ -64,7 +64,7 @@ class PolymerEncoder(nn.Module):
     def freeze_model_layers(self, model, layers_to_freeze):
         for name, param in model.named_parameters():
             if "layer" in name:
-                layer_idx = int(name.split('.')[2])  # Assumes layers are named like "encoder.layer.0"
+                layer_idx = int(name.split('.')[2])  #named as polymerencoder.model.encoder.layer.0... etc."
                 if layer_idx < layers_to_freeze:
                     param.requires_grad = False
 

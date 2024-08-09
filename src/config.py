@@ -130,13 +130,16 @@ ffn_cv = {
   "batch_size": 16, # cannot exceed 32 atm due to memory limits
   "accumulation_steps":4,
   "hidden_size": 1024,
-  "num_hidden_layers": 1,
+  "num_hidden_layers": 2,
   "dropout": 0.1,
   "activation_fn": "relu",
   "init_method": "glorot",
   "output_size": 1,
   "freeze_layers": 12, # by default 12 layers in polyBERT
+  "encoder_init_lr" : 1e-6,
   "lr": 1e-4,
+  'optimizer': "AdamW",
+  "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR"}
   "epochs": 20,
   "use_wandb" : False,
   # optimiser coming soon
@@ -219,8 +222,17 @@ ffn_sweep = {
         'output_size': {
             'value': 1
         },
+        'encoder_init_lr': {
+            'value': 1e-6
+        },
         'lr': {
             'values': [1e-4, 1e-5, 1e-6]
+        },
+        'optimizer': {
+            'value': 'AdamW'
+        },
+        'scheduler': {
+            'value': 'ReduceLROnPlateau'
         },
         'epochs': {
             'value': 3

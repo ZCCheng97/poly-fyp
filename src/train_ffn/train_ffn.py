@@ -5,7 +5,7 @@ from tqdm import tqdm
 import numpy as np
 import os
 
-from .utils import logger
+from .utils import logger, initialize_scheduler, initialize_optimizer
 from .engine_ffn import Engine
 from .model import FFNModel
 from .dataset import FFNDataset
@@ -16,6 +16,8 @@ def train_ffn(tabularsplit,args, trained_model_path, log_csv_path, save = True) 
 
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size)
+
+    num_training_steps = (len(train_loader)//args.batch_size)*(args.epochs//args.accumulation_steps)
     
     model = FFNModel(chemberta_model_name= args.chemberta_model_name, 
                      use_salt_encoder=args.use_salt_encoder, 
@@ -30,9 +32,10 @@ def train_ffn(tabularsplit,args, trained_model_path, log_csv_path, save = True) 
                      output_size=args.output_size,
                      freeze_layers=args.freeze_layers)
     model.to(args.device)
+  
     criterion = nn.L1Loss()
-    optimizer = torch.optim.AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=5)
+    optimizer = initialize_optimizer(args, model) # Fully connected layers (FFN)
+    scheduler = initialize_scheduler(args,optimizer,num_training_steps=num_training_steps)
 
     elapsed_epochs = 0
     current_best_loss = np.inf
