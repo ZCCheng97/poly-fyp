@@ -10,7 +10,7 @@ from .engine_ffn import Engine
 from .model import FFNModel
 from .dataset import FFNDataset
 
-def train_ffn(tabularsplit,args, trained_model_path, log_csv_path) -> float:
+def train_ffn(tabularsplit,args, trained_model_path, log_csv_path, save = True) -> float:
     train_dataset = FFNDataset(tabularsplit.x_train,tabularsplit.y_train,args)
     val_dataset = FFNDataset(tabularsplit.x_val,tabularsplit.y_val,args)
 
@@ -36,7 +36,7 @@ def train_ffn(tabularsplit,args, trained_model_path, log_csv_path) -> float:
 
     elapsed_epochs = 0
     current_best_loss = np.inf
-    if os.path.exists(trained_model_path):
+    if save and os.path.exists(trained_model_path):
         print(f"Model found at location: {trained_model_path}")
         print("Loading from checkpoint...")
         cp = torch.load(trained_model_path, map_location=args.device)
@@ -53,12 +53,15 @@ def train_ffn(tabularsplit,args, trained_model_path, log_csv_path) -> float:
         if val_loss < current_best_loss:
             current_best_loss = val_loss
             best_state = model.state_dict()
-        torch.save({"epoch":epoch+1+elapsed_epochs,
+
+        if save: torch.save({"epoch":epoch+1+elapsed_epochs,
                     "model_state_dict":best_state,
                     "optimizer_state_dict":optimizer.state_dict(),
                     "scheduler_state_dict":scheduler.state_dict(),
                     "current_best_loss":current_best_loss}, trained_model_path)
+            
         scheduler.step(val_loss)
         data_dict = {"Epoch": epoch+1, "Train_loss": train_loss, "Valid_loss": val_loss} 
-        logger(data_dict, log_csv_path, args.use_wandb)
+        
+        if save: logger(data_dict, log_csv_path, args.use_wandb)
     return current_best_loss

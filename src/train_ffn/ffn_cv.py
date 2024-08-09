@@ -30,6 +30,7 @@ def ffn_cv(args):
         output_model_path = models_dir / f"{args.output_name}_fold{fold}.pt"
         print(f"Currently running fold: {fold}")
 
+        datasplit = data[fold]
         if "train" in args.modes:
             if args.use_wandb: 
                 project = args.output_name.split(".")[0]
@@ -39,7 +40,7 @@ def ffn_cv(args):
                         name=f"Fold {fold} Train", 
                         config=args.as_dictionary)  
 
-            datasplit = data[fold] # object of TabularSplit class.
+             # object of TabularSplit class.
             train_res = train_ffn(datasplit, args, output_model_path,output_log_path)
 
             if args.use_wandb: wandb.finish()

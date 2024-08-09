@@ -30,10 +30,10 @@ class Tester:
 
                 # Forward pass
                 outputs = self.model(text_input, attention_mask, salt_input, continuous_vars)
-                scores.append(np.array([func(outputs,labels) if func != spearmanr else func(outputs,labels).statistic for func in self.funcs]))
+                outputs_cpu, labels_cpu = outputs.cpu(), labels.cpu()
+                scores.append(np.array([func(labels_cpu,outputs_cpu) if func != spearmanr else func(labels_cpu,outputs_cpu).statistic for func in self.funcs]))
             
         scores = np.array(scores).mean(axis = 0)
-        print(len(scores))
         return scores
 
 
