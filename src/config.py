@@ -151,10 +151,11 @@ ffn_sweep = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "morgan_ffn_128.pickle",
-  "output_name": "ffn_morgan_hpsweep_LR_BS_NUMLAYERS_dummy",
+  "output_name": "ffn_morgan_hpsweep_LR_BS_NUMLAYERS",
   "fold": 0, # the fold index
-  "rounds": 10,
+  "rounds": 20,
   "seed":42, 
+  'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
     "method": "bayes", # try grid or random or bayes
     "metric": {
@@ -193,13 +194,13 @@ ffn_sweep = {
             'value': 3
         },
         'data_fraction': {
-            'value': 0.01
+            'value': 1
         },
         'batch_size': {
             'value': 16
         },
         'accumulation_steps': {
-            'values': [1,2,4]
+            'values': [2,4,8]
         },
         'hidden_size': {
             'value': 1024
@@ -226,7 +227,7 @@ ffn_sweep = {
             'value': 1e-6
         },
         'lr': {
-            'values': [1e-4, 1e-5, 1e-6]
+            'values': [1e-3,1e-4, 5e-4]
         },
         'optimizer': {
             'value': 'AdamW'
@@ -235,7 +236,7 @@ ffn_sweep = {
             'value': 'ReduceLROnPlateau'
         },
         'epochs': {
-            'value': 3
+            'value': 10
         },
     }
 },
