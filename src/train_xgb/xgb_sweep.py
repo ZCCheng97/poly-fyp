@@ -13,7 +13,9 @@ def xgb_sweep(args):
   input_data_path = data_dir / args.input_data_name
 
   project = args.output_name.split(".")[0]
-  sweep_id = wandb.sweep(args.sweep_config, project=project)
+  api = wandb.Api()
+  entity  = api.viewer.entity
+  sweep_id = f"{entity}/{project}/{args.sweep_id}" if args.sweep_id else wandb.sweep(args.sweep_config,project=project)
   
   def tune():
       with open(input_data_path, 'rb') as f:

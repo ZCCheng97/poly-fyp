@@ -9,7 +9,7 @@ import torch
 
 from .train_ffn import train_ffn
 from .test_ffn import test_ffn
-from .utils import seed_everything, logger
+from .utils import seed_everything, logger, load_best_params
 
 def ffn_cv(args):
     script_dir = Path(__file__).resolve().parent
@@ -31,6 +31,7 @@ def ffn_cv(args):
         print(f"Currently running fold: {fold}")
 
         datasplit = data[fold]
+        params = load_best_params(args.best_params) if args.best_params else args
         if "train" in args.modes:
             if args.use_wandb: 
                 project = args.output_name.split(".")[0]
@@ -38,10 +39,10 @@ def ffn_cv(args):
                 wandb.init(
                         project=project, 
                         name=f"Fold {fold} Train", 
-                        config=args.as_dictionary)  
+                        config=params.as_dictionary)  
 
              # object of TabularSplit class.
-            train_res = train_ffn(datasplit, args, output_model_path,output_log_path)
+            train_res = train_ffn(datasplit, params, output_model_path,output_log_path)
 
             if args.use_wandb: wandb.finish()
 
@@ -52,9 +53,9 @@ def ffn_cv(args):
                 wandb.init(
                         project=project, 
                         name=f"Fold {fold} Test", 
-                        config=args.as_dictionary) 
+                        config=params.as_dictionary) 
 
-            test_scores = test_ffn(datasplit,args, output_model_path)
+            test_scores = test_ffn(datasplit,params, output_model_path)
             data_dict = {
             "fold": fold,
             "mae_mean": test_scores[0],

@@ -14,6 +14,7 @@ def data_cleaning(args):
   .pipe(add_long_smiles)\
   .pipe(add_raw_psmiles)\
   .pipe(add_psmiles)\
+  .pipe(add_monomer_smiles)\
   .pipe(fill_salt_with_Li)\
   .pipe(fill_molality)\
   .pipe(fill_mw)\

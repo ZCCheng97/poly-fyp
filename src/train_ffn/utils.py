@@ -43,3 +43,21 @@ def logger(data_dict:dict, csv_file_path:str, use_wandb: bool= False):
         writer.writeheader()
 
     writer.writerow(data_dict)
+
+def load_best_params(best_params:str="") -> dict:
+  params = dict()
+  if best_params: # loads best params from wandb API if provided path.
+    api = wandb.Api()
+    sweep = api.sweep(best_params)
+    best_run = sweep.best_run()
+    params = best_run.config
+  return get_args(params)
+
+class Arguments:
+    def __init__(self, d):
+        self.as_dictionary = d
+        for key, value in self.as_dictionary.items():
+            setattr(self, key, value)
+        
+def get_args(d):
+    return Arguments(d)

@@ -70,6 +70,11 @@ def add_psmiles(df):
    df["psmiles"] = df["raw_psmiles"].apply(lambda x: str(PS(x).canonicalize))
    return df
 
+def add_monomer_smiles(df):
+  df = df.copy()
+  df["monomer_smiles"] = df["smiles"].apply(lambda x: x.replace("[Cu]", "").replace("[Au]", ""))
+  return df
+
 def remove_all_na(df):
   df = df.copy()
   df = df.dropna()

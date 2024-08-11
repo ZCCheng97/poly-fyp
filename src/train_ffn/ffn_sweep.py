@@ -19,7 +19,6 @@ def ffn_sweep(args):
   project = args.output_name.split(".")[0]
   api = wandb.Api()
   entity  = api.viewer.entity
-  print(entity)
   sweep_id = f"{entity}/{project}/{args.sweep_id}" if args.sweep_id else wandb.sweep(args.sweep_config,project=project)
   fold = args.fold
   
@@ -42,7 +41,7 @@ def ffn_sweep(args):
       train_res = train_ffn(datasplit, config, output_model_path,output_log_path,save = False)
 
       mean_dict = {
-        "mae_mean": train_res,}
+        "mae_mean": train_res}
       wandb.log(mean_dict)
 
   wandb.agent(sweep_id, tune, count=args.rounds)

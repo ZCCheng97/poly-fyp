@@ -7,14 +7,14 @@ data_cleaning = {
 preprocess_xgb = {
   "data_dir_name": "data",
   "input_data_name": "cleaned_data.xlsx",
-  "output_data_name": "polyBERT_xgb.pickle",
-  "cats": ["p_smiles","salt smiles"], # psmiles for polyBERT, long_smiles for morgan
+  "output_data_name": "morgan_xgb_monomerSMILES.pickle",
+  "cats": ["monomer_smiles","salt smiles"], # psmiles for polyBERT, long_smiles for morgan
   "conts": ["mw","molality", "temperature_K"],
-  "drop_columns": ["raw_psmiles","long_smiles","temperature"],
+  "drop_columns": ["raw_psmiles","long_smiles","temperature","psmiles"],
   "train_ratio":0.8,
   "val_ratio":0.1,
   "nfolds": 10,
-  "polymer_use_fp": "polybert", # {"polybert", "morgan", "none"}
+  "polymer_use_fp": "morgan_monomer", # {"polybert", "morgan", "morgan_monomer","none"}
   "salt_use_fp": "morgan", # {"morgan", chemprop?}
   "fpSize": 128,
   "verbose":False
@@ -38,11 +38,11 @@ preprocess_ffn = {
 
 xgb_cv = {
   "use_wandb" : True,
-  "best_params": "zccheng97-nanyang-technological-university-singapore/xgb_morgan_hpsweep/dbl9he9x", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>"
+  "best_params": "zccheng97-nanyang-technological-university-singapore/xgb_morgan_monomerSMILES_hpsweep/1e52oiaj", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>"
   "data_dir_name": "data",
   "results_dir_name": "results",
-  "input_data_name": "morgan_xgb_128.pickle",
-  "output_name": "xgb_morgan_colSMILES_seed42_best.csv",
+  "input_data_name": "morgan_xgb_monomerSMILES.pickle",
+  "output_name": "xgb_morgan_monomerSMILES_seed42_best.csv",
   # "seed_list":[42,3,34,43,83], 
   "seed_list":[42], 
   "verbose": True,
@@ -51,9 +51,10 @@ xgb_cv = {
 xgb_sweep = {
   "data_dir_name": "data",
   "results_dir_name": "results",
-  "input_data_name": "morgan_xgb_128.pickle",
-  "output_name": "xgb_morgan_hpsweep.csv",
+  "input_data_name": "morgan_xgb_monomerSMILES.pickle",
+  "output_name": "xgb_morgan_monomerSMILES_hpsweep.csv",
   "seed_list":[42], 
+  'sweep_id': '', # to resume a sweep after stopping
   "params":{"n_estimators": 200,
         "max_depth": 3,
         "learning_rate": 0.1,
@@ -105,6 +106,8 @@ xgb_sweep = {
 }
 
 ffn_cv = {
+  "use_wandb" : False,
+  "best_params": "", 
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
@@ -141,9 +144,7 @@ ffn_cv = {
   'optimizer': "AdamW",
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR"}
   "epochs": 20,
-  "use_wandb" : False,
-  # optimiser coming soon
-  # scheduler coming soon
+  
   }
 
 ffn_sweep = {
@@ -151,13 +152,13 @@ ffn_sweep = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "morgan_ffn_128.pickle",
-  "output_name": "ffn_morgan_hpsweep_LR_BS_NUMLAYERS",
+  "output_name": "ffn_morgan_hpsweep_data_size",
   "fold": 0, # the fold index
-  "rounds": 20,
+  "rounds": 5,
   "seed":42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
-    "method": "bayes", # try grid or random or bayes
+    "method": "grid", # try grid or random or bayes
     "metric": {
       "name": "mae_mean",
       "goal": "minimize"   
@@ -194,19 +195,19 @@ ffn_sweep = {
             'value': 3
         },
         'data_fraction': {
-            'value': 1
+            'values': [0.01,0.05,0.1,0.5,1.0]
         },
         'batch_size': {
             'value': 16
         },
         'accumulation_steps': {
-            'values': [2,4,8]
+            'values': 2
         },
         'hidden_size': {
             'value': 1024
         },
         'num_hidden_layers': {
-            'values': [1,2,3]
+            'value': 1
         },
         'dropout': {
             'value': 0.1
@@ -227,7 +228,7 @@ ffn_sweep = {
             'value': 1e-6
         },
         'lr': {
-            'values': [1e-3,1e-4, 5e-4]
+            'value': 5e-4
         },
         'optimizer': {
             'value': 'AdamW'
@@ -236,7 +237,7 @@ ffn_sweep = {
             'value': 'ReduceLROnPlateau'
         },
         'epochs': {
-            'value': 10
+            'value': 20
         },
     }
 },

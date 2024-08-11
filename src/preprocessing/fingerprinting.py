@@ -25,6 +25,8 @@ def array_to_cols(df, fp_type, col_name, fpSize):
 def add_fingerprint_cols(df,fpSize, polymer_use_fp, salt_use_fp, tokeniser,model):
   if polymer_use_fp == "morgan":
      df = smiles_to_fingerprint(df, "long_smiles",fpSize=fpSize)
+  if polymer_use_fp == "morgan_monomer":
+     df = smiles_to_fingerprint(df, "monomer_smiles",fpSize=fpSize)
   if polymer_use_fp == "polybert":
      df = smiles_to_polyBERT(df, "psmiles", tokeniser=tokeniser, model=model)
   if salt_use_fp == "morgan":
