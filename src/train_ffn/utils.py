@@ -24,7 +24,7 @@ def initialize_scheduler(args,optimizer,num_training_steps):
     if args.scheduler == "ReduceLROnPlateau":
         return torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=5)
     elif args.scheduler == "LinearLR":
-        return get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=num_training_steps)
+        return get_linear_schedule_with_warmup(optimizer, num_warmup_steps=args.warmup_steps, num_training_steps=num_training_steps)
 
 def logger(data_dict:dict, csv_file_path:str, use_wandb: bool= False):
   if use_wandb: wandb.log(data_dict)

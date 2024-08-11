@@ -28,12 +28,12 @@ class FFNModel(nn.Module):
             ]
             for _ in range(num_hidden_layers-1):
                 ffn.extend([
-                    activation_fn(),
+                    activation_fn,
                     dropout,
                     nn.Linear(hidden_size, hidden_size),
                 ])
             ffn.extend([
-                activation_fn(),
+                activation_fn,
                 dropout,
                 nn.Linear(hidden_size,output_size),
             ])
@@ -112,5 +112,9 @@ def initialize_weights(model: nn.Module, init_method:str = "glorot") -> None:
             intialisations_d[init_method](param)
 
 def pick_activation(activation_fn:str = "relu"):
-    activations_d = {"relu": nn.ReLU}
+    activations_d = {"relu": nn.ReLU(),
+                     'leaky_relu': nn.LeakyReLU(0.1),
+                     'prelu': nn.PReLU(),
+                     'selu': nn.SELU(),
+                     'elu': nn.ELU()}
     return activations_d[activation_fn]

@@ -106,20 +106,20 @@ xgb_sweep = {
 }
 
 ffn_cv = {
-  "use_wandb" : False,
-  "best_params": "", 
+  "use_wandb" : True,
+  "best_params": "", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>."
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "morgan_ffn_128.pickle",
-  "output_name": "dummy", # remember to not include .csv for this particular variable, used to name the model file also
-  "modes": ["train"], # can be either "train", "test" or both
+  "output_name": "ffn_morgan_colSMILES_seed42", # remember to not include .csv for this particular variable, used to name the model file also
+  "modes": ["test"], # can be either "train", "test" or both
 
   # defines model architecture
   "salt_col": "salt smiles", # matches column name in df
   "salt_encoding": "morgan", # matches column name in df
   "conts": ["mw","molality", "temperature_K"],
-  "fold_list":[0], 
+  "fold_list":[0,1,2,3,4,5,6,7,8,9], 
   "seed": 42,
   "device": "cuda",
   "chemberta_model_name": 'kuelumbus/polyBERT',
@@ -127,13 +127,13 @@ ffn_cv = {
   "num_polymer_features": 600,
   "num_salt_features": 128,
   "num_continuous_vars": 3,
-  "data_fraction": 0.01, # use something small like 0.01 if you want to do quick run for error checking
+  "data_fraction": 1, # use something small like 0.01 if you want to do quick run for error checking
 
   # tunable hyperparameters
   "batch_size": 16, # cannot exceed 32 atm due to memory limits
-  "accumulation_steps":4,
+  "accumulation_steps":8,
   "hidden_size": 1024,
-  "num_hidden_layers": 2,
+  "num_hidden_layers": 1,
   "dropout": 0.1,
   "activation_fn": "relu",
   "init_method": "glorot",
@@ -143,8 +143,8 @@ ffn_cv = {
   "lr": 1e-4,
   'optimizer': "AdamW",
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR"}
+  'warmup_steps': 0,
   "epochs": 20,
-  
   }
 
 ffn_sweep = {
@@ -152,13 +152,13 @@ ffn_sweep = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "morgan_ffn_128.pickle",
-  "output_name": "ffn_morgan_hpsweep_data_size",
+  "output_name": "ffn_morgan_hpsweep_other_params",
   "fold": 0, # the fold index
-  "rounds": 5,
+  "rounds": 40,
   "seed":42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
-    "method": "grid", # try grid or random or bayes
+    "method": "bayes", # try grid or random or bayes
     "metric": {
       "name": "mae_mean",
       "goal": "minimize"   
@@ -195,25 +195,25 @@ ffn_sweep = {
             'value': 3
         },
         'data_fraction': {
-            'values': [0.01,0.05,0.1,0.5,1.0]
+            'value': 1.0
         },
         'batch_size': {
             'value': 16
         },
         'accumulation_steps': {
-            'values': 2
+            'value': 2
         },
         'hidden_size': {
-            'value': 1024
+            'values': [512,1024,2048]
         },
         'num_hidden_layers': {
             'value': 1
         },
         'dropout': {
-            'value': 0.1
+            'values': [0.1,0.2,0.3]
         },
         'activation_fn': {
-            'value': 'relu'
+            'values': ['relu','leaky_relu','prelu','selu','elu']
         },
         'init_method': {
             'value': 'glorot'
@@ -228,7 +228,7 @@ ffn_sweep = {
             'value': 1e-6
         },
         'lr': {
-            'value': 5e-4
+            'values': [5e-4, 1e-3]
         },
         'optimizer': {
             'value': 'AdamW'
@@ -236,8 +236,11 @@ ffn_sweep = {
         'scheduler': {
             'value': 'ReduceLROnPlateau'
         },
+        'warmup_steps': {
+            'values': 0
+        },
         'epochs': {
-            'value': 20
+            'value': 15
         },
     }
 },

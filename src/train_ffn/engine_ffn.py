@@ -11,8 +11,9 @@ class Tester:
         self.funcs = [mean_absolute_error,mean_squared_error, spearmanr,r2_score]
     
     def __call__(self, test_dataloader):
-        scores = list()
         self.model.eval()
+        all_outputs = list()
+        all_labels = list()
         with torch.no_grad():
             for batch in tqdm(test_dataloader, desc="Test batch", total=len(test_dataloader)):
                 text_input = batch['input_ids'].squeeze(1) 
@@ -30,10 +31,13 @@ class Tester:
 
                 # Forward pass
                 outputs = self.model(text_input, attention_mask, salt_input, continuous_vars)
-                outputs_cpu, labels_cpu = outputs.cpu(), labels.cpu()
-                scores.append(np.array([func(labels_cpu,outputs_cpu) if func != spearmanr else func(labels_cpu,outputs_cpu).statistic for func in self.funcs]))
+                all_outputs.append(outputs.cpu())
+                all_labels.append(labels.cpu())
             
-        scores = np.array(scores).mean(axis = 0)
+        all_outputs = torch.cat(all_outputs).numpy()
+        all_labels = torch.cat(all_labels).numpy()
+        scores = np.array([func(all_labels,all_outputs) if func != spearmanr else func(all_labels,all_outputs).statistic for func in self.funcs])
+
         return scores
 
 
