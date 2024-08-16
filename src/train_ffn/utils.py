@@ -13,11 +13,24 @@ def seed_everything(seed: int) -> None:
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = True
 
+def arrhenius_score(outputs, temperatures):
+    lnA, Ea = outputs[:,0], outputs[:,1]
+    R = 8.63e-5
+    e = np.exp(1)
+    
+    lnC = lnA - Ea/(R*temperatures)
+    conductivity = lnC * np.log10(e)
+    return conductivity.unsqueeze(1) 
+
 def initialize_optimizer(args, model):
     if args.optimizer == "AdamW":
+       return torch.optim.AdamW([{'params': model.ffn.parameters(), 'lr': args.lr}])
+    if args.optimizer == "AdamW_ratedecay_4_4_4":
         return torch.optim.AdamW([
-    {'params': model.polymerencoder.model.encoder.layer[:6].parameters(), 'lr': args.encoder_init_lr},  # Lower layers of polyencoder
-    {'params': model.polymerencoder.model.encoder.layer[6:].parameters(), 'lr': args.encoder_init_lr*1.75},  # Upper layers of polyencoder
+      {'params': model.polymerencoder.model.embeddings.parameters(), 'lr': args.encoder_init_lr}, 
+      {'params': model.polymerencoder.model.encoder.layer[:4].parameters(), 'lr': args.encoder_init_lr}, 
+    {'params': model.polymerencoder.model.encoder.layer[4:8].parameters(), 'lr': args.encoder_init_lr*1.75},  # Lower layers of polyencoder
+    {'params': model.polymerencoder.model.encoder.layer[8:].parameters(), 'lr': args.encoder_init_lr*3.5},  # Upper layers of polyencoder
     {'params': model.ffn.parameters(), 'lr': args.lr} ])
 
 def initialize_scheduler(args,optimizer,num_training_steps):

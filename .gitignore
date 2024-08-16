@@ -2,3 +2,4 @@ data/
 polyenv/
 .env
 models/
+results/

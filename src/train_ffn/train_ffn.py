@@ -49,7 +49,7 @@ def train_ffn(tabularsplit,args, trained_model_path, log_csv_path, save = True) 
         elapsed_epochs = cp["epoch"]
         current_best_loss = cp["current_best_loss"]
         best_state = cp["model_state_dict"]
-    engine = Engine(model, criterion, optimizer, args.device, args.accumulation_steps)
+    engine = Engine(model, criterion, optimizer, args.device, args.accumulation_steps, args.arrhenius,args.regularisation)
 
     for epoch in tqdm(range(args.epochs-elapsed_epochs), desc="Epoch", total=args.epochs-elapsed_epochs):
         train_loss, val_loss = engine(train_loader, val_loader)

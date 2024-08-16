@@ -4,10 +4,13 @@ from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 import numpy as np
 from scipy.stats import spearmanr
 
+from .utils import arrhenius_score
+
 class Tester:
-    def __init__(self, model, device):
+    def __init__(self, model, device,arrhenius=False):
         self.model = model
         self.device = device
+        self.arrhenius = arrhenius
         self.funcs = [mean_absolute_error,mean_squared_error, spearmanr,r2_score]
     
     def __call__(self, test_dataloader):
@@ -21,6 +24,9 @@ class Tester:
                 salt_input = batch['salt_embedding']
                 continuous_vars = batch['continuous_vars']
                 labels = batch['label_var']
+                if self.arrhenius:
+                    temperatures = batch['temperature']
+                    temperatures = temperatures.to(self.device)
 
                 # Move tensors to device
                 text_input = text_input.to(self.device) 
@@ -31,6 +37,9 @@ class Tester:
 
                 # Forward pass
                 outputs = self.model(text_input, attention_mask, salt_input, continuous_vars)
+                if self.arrhenius:
+                    outputs = arrhenius_score(outputs, temperatures)
+
                 all_outputs.append(outputs.cpu())
                 all_labels.append(labels.cpu())
             
@@ -40,14 +49,15 @@ class Tester:
 
         return scores
 
-
 class Engine:
-    def __init__(self, model, criterion, optimizer, device, accumulation_steps):
+    def __init__(self, model, criterion, optimizer, device, accumulation_steps, arrhenius=False, regularisation = 0.0):
         self.model = model
         self.criterion = criterion
         self.optimizer = optimizer
         self.device = device
         self.accumulation_steps = accumulation_steps
+        self.arrhenius = arrhenius
+        self.regularisation = regularisation
 
     def __call__(self, train_dataloader, val_dataloader):
         train_loss, val_loss = 0.0,0.0
@@ -61,6 +71,9 @@ class Engine:
             salt_input = batch['salt_embedding']
             continuous_vars = batch['continuous_vars']
             labels = batch['label_var']
+            if self.arrhenius:
+                temperatures = batch['temperature']
+                temperatures = temperatures.to(self.device)
 
             # Move tensors to device
             text_input = text_input.to(self.device) 
@@ -71,7 +84,16 @@ class Engine:
 
             # Forward pass
             outputs = self.model(text_input, attention_mask, salt_input, continuous_vars)
-            loss = self.criterion(outputs, labels) / self.accumulation_steps
+
+            if self.arrhenius:
+                lnA,Ea = outputs[:,0],outputs[:,1]
+                outputs = arrhenius_score(outputs,temperatures)
+             
+            if self.arrhenius:
+                loss = self.criterion(outputs, labels) + self.arrhenius_reg(lnA,Ea,self.regularisation) / self.accumulation_steps
+            else:
+                loss = self.criterion(outputs, labels) / self.accumulation_steps
+
 
             # Backward pass and optimization
             loss.backward()
@@ -92,6 +114,9 @@ class Engine:
                 continuous_vars = batch['continuous_vars']
                 labels = batch['label_var']
 
+                if self.arrhenius:
+                    temperatures = batch['temperature']
+                    temperatures = temperatures.to(self.device)
 
                 # Move tensors to device
                 text_input = text_input.to(self.device) 
@@ -102,10 +127,35 @@ class Engine:
 
                 # Forward pass
                 outputs = self.model(text_input, attention_mask, salt_input, continuous_vars)
-                loss = self.criterion(outputs, labels)
+                if self.arrhenius:
+                    outputs = arrhenius_score(outputs,temperatures)
+                
+                if self.arrhenius:
+                    loss = self.criterion(outputs, labels) + self.arrhenius_reg(lnA,Ea,self.regularisation) / self.accumulation_steps
+                else:
+                    loss = self.criterion(outputs, labels) / self.accumulation_steps
 
                 val_loss += loss.item()
             
         val_loss = val_loss / len(val_dataloader)
 
         return train_loss, val_loss
+
+    def arrhenius_reg(self,lnA, Ea, reg_term=0.0):
+        #fit terms and int range taken from experimental fit data and correlation between Ea and lnA
+        slope = 31.999564332937958
+        intercept = -10.412690081157656
+        int_range = 3.06
+        R = 8.63e-5
+
+        #get expected value of Ea
+        exp_lnA = Ea*R * slope + intercept
+        
+        #get absolute value of all residuals, subtract 15 from each
+        residuals = torch.abs(exp_lnA - lnA) - int_range
+        
+        #zero out all residuals within certain distance of fit line
+        #eg don't punish for values within 3 units of fit line
+        residuals = torch.max(residuals,torch.zeros(residuals.shape).to(residuals.device))
+    
+        return reg_term*torch.sum(residuals)

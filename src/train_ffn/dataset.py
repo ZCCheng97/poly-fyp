@@ -21,10 +21,12 @@ class FFNDataset(Dataset):
         tokens = self.df['tokens'].iloc[idx]
         salt_input = self.df[f"{self.args.salt_encoding}_{self.args.salt_col}"].iloc[idx]
         continuous_vars = self.df[self.args.conts].iloc[idx]
+        temperatures = self.df[self.args.temperature_name].iloc[idx]
         return {
             'input_ids': tokens['input_ids'],
             'attention_mask': tokens['attention_mask'],
             'salt_embedding': torch.tensor(salt_input, dtype=torch.float32),
             'continuous_vars': torch.tensor(continuous_vars.values, dtype=torch.float32),
+            'temperature': torch.tensor(temperatures, dtype=torch.float32),
             'label_var': torch.tensor(labels, dtype=torch.float32).unsqueeze(0)
         }

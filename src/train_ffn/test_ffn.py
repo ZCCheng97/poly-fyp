@@ -36,7 +36,7 @@ def test_ffn(tabularsplit, args, trained_model_path) -> float:
     cp = torch.load(trained_model_path, map_location=args.device)
     model.load_state_dict(cp["model_state_dict"])
 
-    engine = Tester(model, args.device)
+    engine = Tester(model, args.device, args.arrhenius)
     scores = engine(test_loader)
 
     return scores

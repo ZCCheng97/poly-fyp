@@ -8,6 +8,7 @@ class FFNModel(nn.Module):
         super(FFNModel, self).__init__()
         self.polymerencoder = PolymerEncoder(chemberta_model_name, freeze_layers=freeze_layers)
         self.saltencoder = SaltEncoder(use_encoder=use_salt_encoder)
+        self.num_continuous_vars = num_continuous_vars
         self.input_dim  = num_polymer_features + num_salt_features + num_continuous_vars
         self.activation_fn = pick_activation(activation_fn)
         self.init_method = init_method
@@ -40,33 +41,35 @@ class FFNModel(nn.Module):
 
         # Create FFN model
         self.ffn = nn.Sequential(*ffn)
-        initialize_weights(self.ffn, init_method=self.init_method)
-
         # Initialize weights if an initialization method is provided
-        
+        initialize_weights(self.ffn, init_method=self.init_method)
     
     def forward(self, text_input, attention_mask, second_seq_input, continuous_vars):
         chemberta_embedding = self.polymerencoder(input_ids=text_input, attention_mask=attention_mask)
         autoencoder_embedding = self.saltencoder(second_seq_input)
+        continuous_vars = continuous_vars[:,:self.num_continuous_vars]
         combined_embedding = torch.cat((chemberta_embedding, autoencoder_embedding, continuous_vars), dim=1)
         ffn_output = self.ffn(combined_embedding)
 
         return ffn_output
     
 class PolymerEncoder(nn.Module):
-    def __init__(self, model_name, freeze_layers=None):
+    def __init__(self, model_name, freeze_layers=12):
         super(PolymerEncoder, self).__init__()
         self.model = AutoModel.from_pretrained(model_name)
 
-        if freeze_layers is not None:
+        if freeze_layers:
             self.freeze_model_layers(self.model, freeze_layers)
     
     def freeze_model_layers(self, model, layers_to_freeze):
         for name, param in model.named_parameters():
+            if "embeddings" in name:
+                param.requires_grad = False
             if "layer" in name:
                 layer_idx = int(name.split('.')[2])  #named as polymerencoder.model.encoder.layer.0... etc."
                 if layer_idx < layers_to_freeze:
                     param.requires_grad = False
+            print(name, param.requires_grad)
 
     def mean_pooling(self, model_output, attention_mask):
         token_embeddings = model_output[0] #First element of model_output contains all token embeddings
