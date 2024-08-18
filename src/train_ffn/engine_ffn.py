@@ -84,24 +84,23 @@ class Engine:
 
             # Forward pass
             outputs = self.model(text_input, attention_mask, salt_input, continuous_vars)
-
             if self.arrhenius:
                 lnA,Ea = outputs[:,0],outputs[:,1]
                 outputs = arrhenius_score(outputs,temperatures)
-             
+
             if self.arrhenius:
-                loss = self.criterion(outputs, labels) + self.arrhenius_reg(lnA,Ea,self.regularisation) / self.accumulation_steps
+                loss = self.criterion(outputs, labels) + self.arrhenius_reg(lnA,Ea,self.regularisation)
             else:
-                loss = self.criterion(outputs, labels) / self.accumulation_steps
+                loss = self.criterion(outputs, labels)
 
-
+            train_loss += loss.item()
+            loss = loss/self.accumulation_steps
+            
             # Backward pass and optimization
             loss.backward()
             if ((i + 1) % self.accumulation_steps == 0) or (i == len(train_dataloader) - 1):
                 self.optimizer.step()  # Update the model's parameters
                 self.optimizer.zero_grad()
-
-            train_loss += loss.item()
 
         train_loss = train_loss / len(train_dataloader)
         self.model.eval()
@@ -131,9 +130,9 @@ class Engine:
                     outputs = arrhenius_score(outputs,temperatures)
                 
                 if self.arrhenius:
-                    loss = self.criterion(outputs, labels) + self.arrhenius_reg(lnA,Ea,self.regularisation) / self.accumulation_steps
+                    loss = self.criterion(outputs, labels) + self.arrhenius_reg(lnA,Ea,self.regularisation)
                 else:
-                    loss = self.criterion(outputs, labels) / self.accumulation_steps
+                    loss = self.criterion(outputs, labels)
 
                 val_loss += loss.item()
             

@@ -106,23 +106,23 @@ xgb_sweep = {
 }
 
 ffn_cv = {
-  "use_wandb" : False,
+  "use_wandb" : True,
   "best_params": "", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>."
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "morgan_ffn_128.pickle",
-  "output_name": "ffn_morgan_colSMILES_seed42_unfrozen_best", # remember to not include .csv for this particular variable, used to name the model file also
-  "modes": ["train","test"], # can be either "train", "test" or both
+  "output_name": "seed42_quick_runs_tune_unnfreeze_all_1e-6_BS64_1e-4FFN", # remember to not include .csv for this particular variable, used to name the model file also
+  "modes": ["test"], # can be either "train", "test" or both
   "arrhenius": False,
   "regularisation": 0,
 
   # defines model architecture
   "salt_col": "salt smiles", # matches column name in df
   "salt_encoding": "morgan", # matches column name in df
-  "conts": ["mw","molality", "temperature_K"], # include temp_K column even if using Arrhenius
+  "conts": ["mw","molality","temperature_K"], # include temp_K column even if using Arrhenius
   "temperature_name": "temperature_K",
-  "fold_list":[0,1,2,3,4,5,6,7,8,9], 
+  "fold_list":[0], 
   "seed": 42,
   "device": "cuda",
   "chemberta_model_name": 'kuelumbus/polyBERT',
@@ -134,7 +134,7 @@ ffn_cv = {
 
   # tunable hyperparameters
   "batch_size": 16, # cannot exceed 32 atm due to memory limits
-  "accumulation_steps": 2,
+  "accumulation_steps": 4,
   "hidden_size": 1024,
   "num_hidden_layers": 1,
   "dropout": 0.1,
@@ -147,7 +147,7 @@ ffn_cv = {
   'optimizer': "AdamW_ratedecay_4_4_4",
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR"}
   'warmup_steps': 100,
-  "epochs": 25,
+  "epochs": 30,
   }
 
 ffn_sweep = {
@@ -155,10 +155,10 @@ ffn_sweep = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "morgan_ffn_128.pickle",
-  "output_name": "ffn_morgan_hpsweep_scheduler",
+  "output_name": "ffn_morgan_frozen_hpsweep_BS_layers_size",
   "fold": 0, # the fold index
-  "rounds": 2,
-  "seed":42, 
+  "rounds": 8,
+  "seed": 42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
     "method": "grid", # try grid or random or bayes
@@ -169,6 +169,12 @@ ffn_sweep = {
     "parameters": {
         'use_wandb' : {
             'value': False # do not change this value. Passed to train_ffn so it does not use wandb
+        },
+        "arrhenius": {
+            'value':False
+        },
+        "regularisation": {
+            'value':0
         },
         "salt_col": {
             "value": "salt smiles"
@@ -198,19 +204,19 @@ ffn_sweep = {
             'value': 3
         },
         'data_fraction': {
-            'value': 1.0
+            'value': 0.5
         },
         'batch_size': {
             'value': 16
         },
         'accumulation_steps': {
-            'value': 2
+            'values': [2,4]
         },
         'hidden_size': {
-            'value': 1024
+            'values': [1024,2048]
         },
         'num_hidden_layers': {
-            'value': 1
+            'values': [1,2]
         },
         'dropout': {
             'value': 0.1
@@ -231,7 +237,7 @@ ffn_sweep = {
             'value': 1e-6
         },
         'lr': {
-            'value': 5e-4
+            'value': 1e-4
         },
         'optimizer': {
             'value': 'AdamW'
@@ -243,7 +249,7 @@ ffn_sweep = {
             'value': 200
         },
         'epochs': {
-            'value': 15
+            'value': 30
         },
     }
 },
