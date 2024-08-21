@@ -155,9 +155,9 @@ ffn_sweep = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "morgan_ffn_128.pickle",
-  "output_name": "ffn_morgan_frozen_hpsweep_BS_layers_size",
+  "output_name": "ffn_morgan_unfrozen_arrhenius_sweeps",
   "fold": 0, # the fold index
-  "rounds": 8,
+  "rounds": 12,
   "seed": 42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
@@ -171,7 +171,7 @@ ffn_sweep = {
             'value': False # do not change this value. Passed to train_ffn so it does not use wandb
         },
         "arrhenius": {
-            'value':False
+            'value': True
         },
         "regularisation": {
             'value':0
@@ -184,6 +184,9 @@ ffn_sweep = {
         },
         "conts": {
             "value": ["mw","molality", "temperature_K"]
+        },
+        "temperature_name": {
+            "value": "temperature_K"
         },
         'device' : {
             'value': 'cuda'
@@ -201,22 +204,22 @@ ffn_sweep = {
             'value': 128
         },
         'num_continuous_vars': {
-            'value': 3
+            'value': 2
         },
         'data_fraction': {
-            'value': 0.5
+            'value': 1
         },
         'batch_size': {
             'value': 16
         },
         'accumulation_steps': {
-            'values': [2,4]
+            'value': 2
         },
         'hidden_size': {
-            'values': [1024,2048]
+            'values': [2048,4096]
         },
         'num_hidden_layers': {
-            'values': [1,2]
+            'values': [2,3]
         },
         'dropout': {
             'value': 0.1
@@ -228,22 +231,22 @@ ffn_sweep = {
             'value': 'glorot'
         },
         'freeze_layers': {
-            'value': 12
+            'value': 0
         },
         'output_size': {
-            'value': 1
+            'value': 2
         },
         'encoder_init_lr': {
             'value': 1e-6
         },
         'lr': {
-            'value': 1e-4
+            'values': [1e-4, 5e-5,1e-5]
         },
         'optimizer': {
-            'value': 'AdamW'
+            'value': 'AdamW_ratedecay_4_4_4'
         },
         'scheduler': {
-            'values': ["ReduceLROnPlateau",'LinearLR']
+            'value': "ReduceLROnPlateau"
         },
         'warmup_steps': {
             'value': 200

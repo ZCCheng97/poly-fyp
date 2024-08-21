@@ -27,7 +27,6 @@ def ffn_sweep(args):
             data = pickle.load(f) # object of list of Datasplit Classes
       torch.cuda.empty_cache()
       
-      
       wandb.init(config=args.as_dictionary)
       config = wandb.config
       seed_everything(args.seed)

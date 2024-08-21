@@ -69,7 +69,6 @@ class PolymerEncoder(nn.Module):
                 layer_idx = int(name.split('.')[2])  #named as polymerencoder.model.encoder.layer.0... etc."
                 if layer_idx < layers_to_freeze:
                     param.requires_grad = False
-            print(name, param.requires_grad)
 
     def mean_pooling(self, model_output, attention_mask):
         token_embeddings = model_output[0] #First element of model_output contains all token embeddings
