@@ -19,7 +19,7 @@ class FFNDataset(Dataset):
         if self.args.data_fraction < 1.0: idx = self.indices[idx].item()
         labels = self.y.iloc[idx]
         tokens = self.df['tokens'].iloc[idx]
-        salt_input = self.df[f"{self.args.salt_encoding}_{self.args.salt_col}"].iloc[idx]
+        salt_input = self.df[f'{self.args.salt_encoding}_fp_'+self.args.salt_col].iloc[idx]
         continuous_vars = self.df[self.args.conts].iloc[idx]
         temperatures = self.df[self.args.temperature_name].iloc[idx]
         return {

@@ -129,11 +129,7 @@ class Engine:
                 if self.arrhenius:
                     outputs = arrhenius_score(outputs,temperatures)
                 
-                if self.arrhenius:
-                    loss = self.criterion(outputs, labels) + self.arrhenius_reg(lnA,Ea,self.regularisation)
-                else:
-                    loss = self.criterion(outputs, labels)
-
+                loss = self.criterion(outputs, labels)
                 val_loss += loss.item()
             
         val_loss = val_loss / len(val_dataloader)
@@ -147,7 +143,7 @@ class Engine:
         int_range = 3.06
         R = 8.63e-5
 
-        #get expected value of Ea
+        #get expected value of lnA
         exp_lnA = Ea*R * slope + intercept
         
         #get absolute value of all residuals, subtract 15 from each

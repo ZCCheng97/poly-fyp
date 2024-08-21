@@ -7,15 +7,15 @@ data_cleaning = {
 preprocess_xgb = {
   "data_dir_name": "data",
   "input_data_name": "cleaned_data.xlsx",
-  "output_data_name": "morgan_xgb_monomerSMILES.pickle",
-  "cats": ["monomer_smiles","salt smiles"], # psmiles for polyBERT, long_smiles for morgan
+  "output_data_name": "chemberta_xgb_colSMILES.pickle",
+  "cats": ["psmiles","salt smiles"], # psmiles for polyBERT, long_smiles for morgan
   "conts": ["mw","molality", "temperature_K"],
-  "drop_columns": ["raw_psmiles","long_smiles","temperature","psmiles"],
+  "drop_columns": ["raw_psmiles","long_smiles","temperature","monomer_smiles"],
   "train_ratio":0.8,
   "val_ratio":0.1,
   "nfolds": 10,
-  "polymer_use_fp": "morgan_monomer", # {"polybert", "morgan", "morgan_monomer","none"}
-  "salt_use_fp": "morgan", # {"morgan", chemprop?}
+  "polymer_use_fp": "polybert", # {"polybert", "morgan", "morgan_monomer","none"}
+  "salt_use_fp": "chemberta", # {"morgan", "chemberta"}
   "fpSize": 128,
   "verbose":False
 }
@@ -23,7 +23,7 @@ preprocess_xgb = {
 preprocess_ffn = {
   "data_dir_name": "data",
   "input_data_name": "cleaned_data.xlsx",
-  "output_data_name": "morgan_ffn_128.pickle",
+  "output_data_name": "chemberta_ffn_128.pickle",
   "train_ratio":0.8,
   "val_ratio":0.1,
   "nfolds": 10,
@@ -31,18 +31,18 @@ preprocess_ffn = {
   "salt_col": "salt smiles",
   "conts": ["mw","molality","temperature_K"],
   "transformer_name": 'kuelumbus/polyBERT',
-  "salt_encoding": "morgan", # {"morgan", chemprop?}
+  "salt_encoding": "chemberta", # {"morgan", "chemberta"}
   "fpSize": 128,
   "verbose":False
 }
 
 xgb_cv = {
   "use_wandb" : True,
-  "best_params": "zccheng97-nanyang-technological-university-singapore/xgb_morgan_monomerSMILES_hpsweep/1e52oiaj", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>"
+  "best_params": "", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>"
   "data_dir_name": "data",
   "results_dir_name": "results",
-  "input_data_name": "morgan_xgb_monomerSMILES.pickle",
-  "output_name": "xgb_morgan_monomerSMILES_seed42_best.csv",
+  "input_data_name": "chemberta_xgb_colSMILES.pickle",
+  "output_name": "xgb_chemberta_colSMILES_seed42_best.csv",
   # "seed_list":[42,3,34,43,83], 
   "seed_list":[42], 
   "verbose": True,
@@ -106,20 +106,20 @@ xgb_sweep = {
 }
 
 ffn_cv = {
-  "use_wandb" : True,
+  "use_wandb" : False,
   "best_params": "", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>."
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "morgan_ffn_128.pickle",
-  "output_name": "seed42_quick_runs_tune_unnfreeze_all_1e-6_BS64_1e-4FFN", # remember to not include .csv for this particular variable, used to name the model file also
-  "modes": ["test"], # can be either "train", "test" or both
+  "input_data_name": "chemberta_ffn_128.pickle",
+  "output_name": "chemberta_frozen_dummy", # remember to not include .csv for this particular variable, used to name the model file also
+  "modes": ["train"], # can be either "train", "test" or both
   "arrhenius": False,
   "regularisation": 0,
 
   # defines model architecture
   "salt_col": "salt smiles", # matches column name in df
-  "salt_encoding": "morgan", # matches column name in df
+  "salt_encoding": "chemberta", # matches column name in df
   "conts": ["mw","molality","temperature_K"], # include temp_K column even if using Arrhenius
   "temperature_name": "temperature_K",
   "fold_list":[0], 
@@ -128,36 +128,36 @@ ffn_cv = {
   "chemberta_model_name": 'kuelumbus/polyBERT',
   "use_salt_encoder": False, # always False for now.
   "num_polymer_features": 600,
-  "num_salt_features": 128,
+  "num_salt_features": 768, # 768 for chemberta, 128 for morgan
   "num_continuous_vars": 3, # change to 2 if using Arrhenius mode, otherwise 3 cont variables
-  "data_fraction": 1, # use something small like 0.01 if you want to do quick run for error checking
+  "data_fraction": .01, # use something small like 0.01 if you want to do quick run for error checking
 
   # tunable hyperparameters
   "batch_size": 16, # cannot exceed 32 atm due to memory limits
-  "accumulation_steps": 4,
-  "hidden_size": 1024,
+  "accumulation_steps": 2,
+  "hidden_size": 2048,
   "num_hidden_layers": 1,
   "dropout": 0.1,
   "activation_fn": "relu",
   "init_method": "glorot",
   "output_size": 1, # change to 2 if using Arrhenius mode, otherwise 1
-  "freeze_layers": 0, # by default 12 layers in polyBERT
+  "freeze_layers": 12, # by default 12 layers in polyBERT
   "encoder_init_lr" : 1e-6,
   "lr": 1e-4,
   'optimizer': "AdamW_ratedecay_4_4_4",
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR"}
   'warmup_steps': 100,
-  "epochs": 30,
+  "epochs": 2,
   }
 
 ffn_sweep = {
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "morgan_ffn_128.pickle",
-  "output_name": "ffn_morgan_unfrozen_arrhenius_sweeps",
+  "input_data_name": "chemberta_ffn_128.pickle",
+  "output_name": "ffn_chemberta_frozen_hpsweep",
   "fold": 0, # the fold index
-  "rounds": 12,
+  "rounds": 24,
   "seed": 42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
@@ -171,7 +171,7 @@ ffn_sweep = {
             'value': False # do not change this value. Passed to train_ffn so it does not use wandb
         },
         "arrhenius": {
-            'value': True
+            'value': False
         },
         "regularisation": {
             'value':0
@@ -180,7 +180,7 @@ ffn_sweep = {
             "value": "salt smiles"
         },
         "salt_encoding": {
-            "value": "morgan"
+            "value": "chemberta"
         },
         "conts": {
             "value": ["mw","molality", "temperature_K"]
@@ -201,25 +201,25 @@ ffn_sweep = {
             'value': 600
         },
         'num_salt_features': {
-            'value': 128
+            'value': 768
         },
         'num_continuous_vars': {
-            'value': 2
+            'value': 3
         },
         'data_fraction': {
-            'value': 1
+            'value': .5
         },
         'batch_size': {
             'value': 16
         },
         'accumulation_steps': {
-            'value': 2
+            'values': [2,4,8]
         },
         'hidden_size': {
-            'values': [2048,4096]
+            'values': [1024,2048]
         },
         'num_hidden_layers': {
-            'values': [2,3]
+            'values': [1,2]
         },
         'dropout': {
             'value': 0.1
@@ -231,16 +231,16 @@ ffn_sweep = {
             'value': 'glorot'
         },
         'freeze_layers': {
-            'value': 0
+            'value': 12
         },
         'output_size': {
-            'value': 2
+            'value': 1
         },
         'encoder_init_lr': {
             'value': 1e-6
         },
         'lr': {
-            'values': [1e-4, 5e-5,1e-5]
+            'values': [1e-4, 1e-5]
         },
         'optimizer': {
             'value': 'AdamW_ratedecay_4_4_4'
@@ -252,7 +252,7 @@ ffn_sweep = {
             'value': 200
         },
         'epochs': {
-            'value': 30
+            'value': 25
         },
     }
 },
