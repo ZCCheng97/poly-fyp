@@ -23,15 +23,15 @@ preprocess_xgb = {
 preprocess_ffn = {
   "data_dir_name": "data",
   "input_data_name": "cleaned_data.xlsx",
-  "output_data_name": "chemberta_ffn_128.pickle",
+  "output_data_name": "morgan_ffn_128_arrTemp.pickle",
   "train_ratio":0.8,
   "val_ratio":0.1,
   "nfolds": 10,
   "text_col": "psmiles",
   "salt_col": "salt smiles",
-  "conts": ["mw","molality","temperature_K"],
+  "conts": ["mw","molality"],
   "transformer_name": 'kuelumbus/polyBERT',
-  "salt_encoding": "chemberta", # {"morgan", "chemberta"}
+  "salt_encoding": "morgan", # {"morgan", "chemberta"}
   "fpSize": 128,
   "verbose":False
 }
@@ -154,10 +154,10 @@ ffn_sweep = {
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "chemberta_ffn_128.pickle",
-  "output_name": "ffn_chemberta_frozen_hpsweep",
+  "input_data_name": "morgan_ffn_128_arrTemp.pickle",
+  "output_name": "dummy",
   "fold": 0, # the fold index
-  "rounds": 24,
+  "rounds": 12,
   "seed": 42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
@@ -171,7 +171,7 @@ ffn_sweep = {
             'value': False # do not change this value. Passed to train_ffn so it does not use wandb
         },
         "arrhenius": {
-            'value': False
+            'value': True
         },
         "regularisation": {
             'value':0
@@ -180,7 +180,7 @@ ffn_sweep = {
             "value": "salt smiles"
         },
         "salt_encoding": {
-            "value": "chemberta"
+            "value": "morgan"
         },
         "conts": {
             "value": ["mw","molality", "temperature_K"]
@@ -201,25 +201,25 @@ ffn_sweep = {
             'value': 600
         },
         'num_salt_features': {
-            'value': 768
+            'value': 128
         },
         'num_continuous_vars': {
-            'value': 3
+            'value': 2
         },
         'data_fraction': {
-            'value': .5
+            'value': 1
         },
         'batch_size': {
             'value': 16
         },
         'accumulation_steps': {
-            'values': [2,4,8]
+            'value': 2
         },
         'hidden_size': {
-            'values': [1024,2048]
+            'values': [1024,4096]
         },
         'num_hidden_layers': {
-            'values': [1,2]
+            'values': [2,3]
         },
         'dropout': {
             'value': 0.1
@@ -231,16 +231,16 @@ ffn_sweep = {
             'value': 'glorot'
         },
         'freeze_layers': {
-            'value': 12
+            'value': 0
         },
         'output_size': {
-            'value': 1
+            'value': 2
         },
         'encoder_init_lr': {
             'value': 1e-6
         },
         'lr': {
-            'values': [1e-4, 1e-5]
+            'values': [1e-4, 5e-5,1e-5]
         },
         'optimizer': {
             'value': 'AdamW_ratedecay_4_4_4'
@@ -252,7 +252,7 @@ ffn_sweep = {
             'value': 200
         },
         'epochs': {
-            'value': 25
+            'value': 2
         },
     }
 },

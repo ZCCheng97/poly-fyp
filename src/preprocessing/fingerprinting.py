@@ -65,7 +65,7 @@ def smiles_to_fingerprint(df,col_name, fpSize = 128, to_cols = True):
     df = df.copy()
     mfpgen = rdFingerprintGenerator.GetMorganGenerator(radius=3,fpSize=fpSize)
 
-    df['Morgan_fp_'+col_name] = df[col_name].apply(lambda x: mfpgen.GetFingerprint(Chem.MolFromSmiles(x)))
+    df['morgan_fp_'+col_name] = df[col_name].apply(lambda x: mfpgen.GetFingerprint(Chem.MolFromSmiles(x)))
 
-    if to_cols: df = array_to_cols(df, "Morgan_fp", col_name, fpSize = fpSize)
+    if to_cols: df = array_to_cols(df, "morgan_fp", col_name, fpSize = fpSize)
     return df
