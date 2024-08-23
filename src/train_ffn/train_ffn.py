@@ -19,8 +19,8 @@ def train_ffn(tabularsplit,args, trained_model_path, log_csv_path, save = True) 
 
     num_training_steps = (len(train_loader)//args.batch_size)*(args.epochs//args.accumulation_steps)
     
-    model = FFNModel(chemberta_model_name= args.chemberta_model_name, 
-                     use_salt_encoder=args.use_salt_encoder, 
+    model = FFNModel(poly_model_name= args.poly_model_name, 
+                     salt_model_name=args.salt_model_name, 
                      num_polymer_features=args.num_polymer_features, 
                      num_salt_features=args.num_salt_features, 
                      num_continuous_vars=args.num_continuous_vars,
@@ -30,7 +30,8 @@ def train_ffn(tabularsplit,args, trained_model_path, log_csv_path, save = True) 
                      activation_fn=args.activation_fn, 
                      init_method=args.init_method, 
                      output_size=args.output_size,
-                     freeze_layers=args.freeze_layers)
+                     freeze_layers=args.freeze_layers,
+                     salt_freeze_layers=args.salt_freeze_layers)
     model.to(args.device)
   
     criterion = nn.L1Loss()

@@ -23,26 +23,28 @@ preprocess_xgb = {
 preprocess_ffn = {
   "data_dir_name": "data",
   "input_data_name": "cleaned_data.xlsx",
-  "output_data_name": "morgan_ffn_128_arrTemp.pickle",
+  "output_data_name": "morgan_ffn_morgan.pickle", # {poly_encoding}_{ffn/xgb}_{salt_encoding}_{arr/None}.pickle
   "train_ratio":0.8,
   "val_ratio":0.1,
   "nfolds": 10,
-  "text_col": "psmiles",
+  "poly_encoding": "morgan", # {"polybert_tokenizer", "morgan"}
+  "poly_model_name": '', # {'kuelumbus/polyBERT', }
+  "poly_col": "long_smiles",
+  "salt_encoding": "morgan", # {"morgan", "chemberta_tokneizer"}
+  "salt_model_name": '',
   "salt_col": "salt smiles",
-  "conts": ["mw","molality"],
-  "transformer_name": 'kuelumbus/polyBERT',
-  "salt_encoding": "morgan", # {"morgan", "chemberta"}
+  "conts": ["mw","molality","temperature"],
   "fpSize": 128,
   "verbose":False
 }
 
 xgb_cv = {
   "use_wandb" : True,
-  "best_params": "", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>"
+  "best_params": "zccheng97-nanyang-technological-university-singapore/xgb_chemberta_colSMILES_hpsweep/7do0v6ii", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>"
   "data_dir_name": "data",
   "results_dir_name": "results",
   "input_data_name": "chemberta_xgb_colSMILES.pickle",
-  "output_name": "xgb_chemberta_colSMILES_seed42_best.csv",
+  "output_name": "xgb_chemberta_colSMILES_seed42_best2.csv",
   # "seed_list":[42,3,34,43,83], 
   "seed_list":[42], 
   "verbose": True,
@@ -51,8 +53,8 @@ xgb_cv = {
 xgb_sweep = {
   "data_dir_name": "data",
   "results_dir_name": "results",
-  "input_data_name": "morgan_xgb_monomerSMILES.pickle",
-  "output_name": "xgb_morgan_monomerSMILES_hpsweep.csv",
+  "input_data_name": "chemberta_xgb_colSMILES.pickle",
+  "output_name": "xgb_chemberta_colSMILES_hpsweep.csv",
   "seed_list":[42], 
   'sweep_id': '', # to resume a sweep after stopping
   "params":{"n_estimators": 200,
@@ -106,31 +108,33 @@ xgb_sweep = {
 }
 
 ffn_cv = {
-  "use_wandb" : True,
+  "use_wandb" : False,
   "best_params": "", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>."
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "chemberta_ffn_128.pickle",
-  "output_name": "ffn_chemberta_colSMILES_seed42", # remember to not include .csv for this particular variable, used to name the model file also
+  "input_data_name": "morgan_ffn_morgan.pickle",
+  "output_name": "morgan_ffn_morgan_DUMMY", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train", "test"], # can be either "train", "test" or both
   "arrhenius": False,
   "regularisation": 0,
 
   # defines model architecture
   "salt_col": "salt smiles", # matches column name in df
-  "salt_encoding": "chemberta", # matches column name in df
+  "salt_encoding": "morgan", # matches column name in df, use "chemberta_tokenizer" for encoding, "morgan" for fp
+  "salt_model_name": '', # 'seyonec/ChemBERTa-zinc-base-v1' for Chemberta, blank if not using trained embeddings
+  'poly_col': "long_smiles",# matches column name in df
+  "poly_encoding": "morgan", # matches column name in df, use "polybert_tokenizer" for encoding, "morgan" for fp
+  "poly_model_name": '', # blank if not using trained embeddings
   "conts": ["mw","molality","temperature_K"], # include temp_K column even if using Arrhenius
   "temperature_name": "temperature_K",
-  "fold_list":[0,1,2,3,4,5,6,7,8,9], 
+  "fold_list":[0], 
   "seed": 42,
   "device": "cuda",
-  "chemberta_model_name": 'kuelumbus/polyBERT',
-  "use_salt_encoder": False, # always False for now.
-  "num_polymer_features": 600,
-  "num_salt_features": 768, # 768 for chemberta, 128 for morgan
-  "num_continuous_vars": 3, # change to 2 if using Arrhenius mode, otherwise 3 cont variables
-  "data_fraction": 1, # use something small like 0.01 if you want to do quick run for error checking
+  "num_polymer_features": 128, # 600 for polybert, 128 for morgan
+  "num_salt_features": 128, # 768 for chemberta, 128 for morgan
+  "num_continuous_vars": 1, # change to 2 if using Arrhenius mode, otherwise 3 cont variables
+  "data_fraction": .01, # use something small like 0.01 if you want to do quick run for error checking
 
   # tunable hyperparameters
   "batch_size": 16, # cannot exceed 32 atm due to memory limits
@@ -142,22 +146,24 @@ ffn_cv = {
   "init_method": "glorot",
   "output_size": 1, # change to 2 if using Arrhenius mode, otherwise 1
   "freeze_layers": 12, # by default 12 layers in polyBERT
-  "encoder_init_lr" : 1e-6,
+  "encoder_init_lr" : 1e-6, # only passed to initialise_optimiser
+  "salt_freeze_layers": 12,
+  "salt_encoder_init_lr": 1e-6, # only passed to initialise_optimiser
   "lr": 1e-4,
-  'optimizer': "AdamW_ratedecay_4_4_4",
+  'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR"}
   'warmup_steps': 100,
-  "epochs": 25,
+  "epochs": 1,
   }
 
 ffn_sweep = {
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "morgan_ffn_128_arrTemp.pickle",
-  "output_name": "dummy",
+  "input_data_name": "morgan_ffn_morgan.pickle",
+  "output_name": "morgan_ffn_morgan_sweeps",
   "fold": 0, # the fold index
-  "rounds": 12,
+  "rounds": 36,
   "seed": 42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
@@ -171,7 +177,7 @@ ffn_sweep = {
             'value': False # do not change this value. Passed to train_ffn so it does not use wandb
         },
         "arrhenius": {
-            'value': True
+            'value': False
         },
         "regularisation": {
             'value':0
@@ -182,6 +188,9 @@ ffn_sweep = {
         "salt_encoding": {
             "value": "morgan"
         },
+        "salt_model_name": {
+            "value": ""
+        },
         "conts": {
             "value": ["mw","molality", "temperature_K"]
         },
@@ -191,20 +200,23 @@ ffn_sweep = {
         'device' : {
             'value': 'cuda'
         },
-        'chemberta_model_name': {
-            'value': 'kuelumbus/polyBERT'
+        'poly_model_name': {
+            'value': ''
         },
-        'use_salt_encoder': {
-            'value': False
+        'poly_encoding': {
+            'value': 'morgan'
+        },
+        'poly_col': {
+            'value': 'long_smiles'
         },
         'num_polymer_features': {
-            'value': 600
+            'value': 128
         },
         'num_salt_features': {
             'value': 128
         },
         'num_continuous_vars': {
-            'value': 2
+            'value': 3
         },
         'data_fraction': {
             'value': 1
@@ -213,13 +225,13 @@ ffn_sweep = {
             'value': 16
         },
         'accumulation_steps': {
-            'value': 2
+            'values': [2,4,8]
         },
         'hidden_size': {
-            'values': [1024,4096]
+            'values': [1024,2048]
         },
         'num_hidden_layers': {
-            'values': [2,3]
+            'values': [1,2]
         },
         'dropout': {
             'value': 0.1
@@ -231,19 +243,25 @@ ffn_sweep = {
             'value': 'glorot'
         },
         'freeze_layers': {
-            'value': 0
-        },
-        'output_size': {
-            'value': 2
+            'value': 12
         },
         'encoder_init_lr': {
             'value': 1e-6
+        },
+        'salt_freeze_layers': {
+            'value': 12
+        },
+        'salt_encoder_init_lr': {
+            'value': 1e-6
+        },
+        'output_size': {
+            'value': 1
         },
         'lr': {
             'values': [1e-4, 5e-5,1e-5]
         },
         'optimizer': {
-            'value': 'AdamW_ratedecay_4_4_4'
+            'value': 'AdamW'
         },
         'scheduler': {
             'value': "ReduceLROnPlateau"
@@ -252,7 +270,7 @@ ffn_sweep = {
             'value': 200
         },
         'epochs': {
-            'value': 2
+            'value': 25
         },
     }
 },

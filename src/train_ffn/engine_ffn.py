@@ -19,9 +19,8 @@ class Tester:
         all_labels = list()
         with torch.no_grad():
             for batch in tqdm(test_dataloader, desc="Test batch", total=len(test_dataloader)):
-                text_input = batch['input_ids'].squeeze(1) 
-                attention_mask = batch['attention_mask'].squeeze(1)
-                salt_input = batch['salt_embedding']
+                text_input = batch['poly_inputs']
+                salt_input = batch['salt_inputs']
                 continuous_vars = batch['continuous_vars']
                 labels = batch['label_var']
                 if self.arrhenius:
@@ -30,13 +29,12 @@ class Tester:
 
                 # Move tensors to device
                 text_input = text_input.to(self.device) 
-                attention_mask = attention_mask.to(self.device)
                 salt_input = salt_input.to(self.device)
                 continuous_vars = continuous_vars.to(self.device)
                 labels = labels.to(self.device)
 
                 # Forward pass
-                outputs = self.model(text_input, attention_mask, salt_input, continuous_vars)
+                outputs = self.model(text_input, salt_input, continuous_vars)
                 if self.arrhenius:
                     outputs = arrhenius_score(outputs, temperatures)
 
@@ -66,9 +64,8 @@ class Engine:
         # Zero the parameter gradients
         self.optimizer.zero_grad()
         for i, batch in enumerate(tqdm(train_dataloader, desc="Training batch", total=len(train_dataloader))):
-            text_input = batch['input_ids'].squeeze(1) 
-            attention_mask = batch['attention_mask'].squeeze(1)
-            salt_input = batch['salt_embedding']
+            text_input = batch['poly_inputs']
+            salt_input = batch['salt_inputs']
             continuous_vars = batch['continuous_vars']
             labels = batch['label_var']
             if self.arrhenius:
@@ -77,13 +74,12 @@ class Engine:
 
             # Move tensors to device
             text_input = text_input.to(self.device) 
-            attention_mask = attention_mask.to(self.device)
             salt_input = salt_input.to(self.device)
             continuous_vars = continuous_vars.to(self.device)
             labels = labels.to(self.device)
 
             # Forward pass
-            outputs = self.model(text_input, attention_mask, salt_input, continuous_vars)
+            outputs = self.model(text_input, salt_input, continuous_vars)
             if self.arrhenius:
                 lnA,Ea = outputs[:,0],outputs[:,1]
                 outputs = arrhenius_score(outputs,temperatures)
@@ -107,9 +103,8 @@ class Engine:
 
         with torch.no_grad():
             for batch in tqdm(val_dataloader, desc="Validation batch", total=len(val_dataloader)):
-                text_input = batch['input_ids'].squeeze(1) 
-                attention_mask = batch['attention_mask'].squeeze(1)
-                salt_input = batch['salt_embedding']
+                text_input = batch['poly_inputs']
+                salt_input = batch['salt_inputs']
                 continuous_vars = batch['continuous_vars']
                 labels = batch['label_var']
 
@@ -119,13 +114,12 @@ class Engine:
 
                 # Move tensors to device
                 text_input = text_input.to(self.device) 
-                attention_mask = attention_mask.to(self.device)
                 salt_input = salt_input.to(self.device)
                 continuous_vars = continuous_vars.to(self.device)
                 labels = labels.to(self.device)
 
                 # Forward pass
-                outputs = self.model(text_input, attention_mask, salt_input, continuous_vars)
+                outputs = self.model(text_input, salt_input, continuous_vars)
                 if self.arrhenius:
                     outputs = arrhenius_score(outputs,temperatures)
                 

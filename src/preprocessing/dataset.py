@@ -7,7 +7,7 @@ from transformers import AutoTokenizer, AutoModel
 from rdkit.Chem import rdFingerprintGenerator
 from rdkit import Chem
 
-from .fingerprinting import add_fingerprint_cols, smiles_to_fingerprint,smiles_to_encoding
+from .fingerprinting import add_fingerprint_cols, smiles_to_fingerprint
 from .tensorify import smiles_to_tokens
 from .utils import stratified_split, standardise, xy_split
 
@@ -17,14 +17,17 @@ class TorchDataset:
       self.folds = list()
 
   def process(self,args) -> List[dict]:
-    tokeniser = AutoTokenizer.from_pretrained(args.transformer_name)
-    self.df = smiles_to_tokens(self.df, args.text_col,tokeniser)
+    if args.poly_encoding == "morgan":
+      self.df = smiles_to_fingerprint(self.df, args.poly_col, args.fpSize, to_cols = False)
+    if args.poly_encoding == "polybert_tokenizer":
+      tokeniser = AutoTokenizer.from_pretrained(args.poly_model_name)
+      self.df = smiles_to_tokens(self.df, args.poly_col, tokeniser)
+
     if args.salt_encoding == "morgan":
       self.df = smiles_to_fingerprint(self.df, args.salt_col, args.fpSize, to_cols = False)
-    if args.salt_encoding == "chemberta":
-      chemberta_model = AutoModel.from_pretrained("seyonec/ChemBERTa-zinc-base-v1")
-      chemberta_tokeniser = AutoTokenizer.from_pretrained("seyonec/ChemBERTa-zinc-base-v1")
-      self.df = smiles_to_encoding(self.df, args.salt_col, chemberta_tokeniser, chemberta_model, args.salt_encoding, to_cols = False)
+    if args.salt_encoding == "chemberta_tokenzer":
+      chemberta_tokeniser = AutoTokenizer.from_pretrained(args.salt_model_name)
+      self.df = smiles_to_tokens(self.df, args.salt_col, chemberta_tokeniser)
 
     df_list, label_counts_list = stratified_split(self.df, train_ratio=args.train_ratio, val_ratio=args.val_ratio, nfolds = args.nfolds,verbose = args.verbose)
     for fold in tqdm(range(args.nfolds), desc = "Curr Fold"):

@@ -14,8 +14,8 @@ def test_ffn(tabularsplit, args, trained_model_path) -> float:
     test_dataset = FFNDataset(tabularsplit.x_test,tabularsplit.y_test,args)
     test_loader = DataLoader(test_dataset, batch_size=args.batch_size)
     
-    model = FFNModel(chemberta_model_name= args.chemberta_model_name, 
-                     use_salt_encoder=args.use_salt_encoder, 
+    model = FFNModel(poly_model_name= args.poly_model_name, 
+                     salt_model_name=args.salt_model_name, 
                      num_polymer_features=args.num_polymer_features, 
                      num_salt_features=args.num_salt_features, 
                      num_continuous_vars=args.num_continuous_vars,
@@ -25,7 +25,8 @@ def test_ffn(tabularsplit, args, trained_model_path) -> float:
                      activation_fn=args.activation_fn, 
                      init_method=args.init_method, 
                      output_size=args.output_size,
-                     freeze_layers=args.freeze_layers)
+                     freeze_layers=args.freeze_layers,
+                     salt_freeze_layers=args.salt_freeze_layers)
     model.to(args.device)
 
     if not os.path.exists(trained_model_path):
