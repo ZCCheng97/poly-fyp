@@ -84,8 +84,16 @@ def stratified_split(df, train_ratio=0.8, val_ratio=0.1, nfolds = 10,verbose = T
       print("Unique labels:",label_counts)
   return output_list, label_counts_list
 
-def standardise(x_train:pd.DataFrame,x_val:pd.DataFrame,x_test:pd.DataFrame, conts:List[str]) -> Tuple[pd.DataFrame]:
+def standardise(x_train:pd.DataFrame,x_val:pd.DataFrame,x_test:pd.DataFrame, conts:List[str], keep_cols = True) -> Tuple[pd.DataFrame]:
     scaler = StandardScaler()
+    if keep_cols:
+        for sub_df in [x_train,x_val,x_test]:
+          # Create duplicated columns with suffix
+          df_copies = sub_df[conts].copy()
+          df_copies.columns = [f"{col}_original" for col in df_copies.columns]
+
+          # Concatenate the duplicated columns back to the original dataframe
+          sub_df = pd.concat([sub_df, df_copies], axis=1)
 
     x_train[conts] = scaler.fit_transform(x_train[conts])
     x_val[conts] = scaler.transform(x_val[conts])

@@ -12,7 +12,7 @@ from .dataset import FFNDataset
 def test_ffn(tabularsplit, args, trained_model_path) -> float:
 
     test_dataset = FFNDataset(tabularsplit.x_test,tabularsplit.y_test,args)
-    test_loader = DataLoader(test_dataset, batch_size=args.batch_size)
+    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle = False)
     
     model = FFNModel(poly_model_name= args.poly_model_name, 
                      salt_model_name=args.salt_model_name, 
@@ -38,6 +38,7 @@ def test_ffn(tabularsplit, args, trained_model_path) -> float:
     model.load_state_dict(cp["model_state_dict"])
 
     engine = Tester(model, args.device, args.arrhenius)
-    scores = engine(test_loader)
+    scores, labels, preds = engine(test_loader)
+    
 
-    return scores
+    return scores, test_dataset.df,labels,preds

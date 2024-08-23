@@ -74,7 +74,7 @@ class TabularDataset:
                                   add_fingerprint_cols(val_df, args.fpSize, args.polymer_use_fp, args.salt_use_fp, tokeniser,model, salt_tokeniser, salt_model), 
                                   add_fingerprint_cols(test_df,args.fpSize, args.polymer_use_fp, args.salt_use_fp, tokeniser,model, salt_tokeniser, salt_model))
 
-      train_dfs, val_dfs, test_dfs = standardise(train_df, val_df, test_df, conts = args.conts)
+      train_dfs, val_dfs, test_dfs = standardise(train_df, val_df, test_df, conts = args.conts, keep_cols=False)
 
       curr_fold = TabularSplit(train_dfs,val_dfs,test_dfs, label_counts = label_counts_list[fold])
 

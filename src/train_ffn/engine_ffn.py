@@ -45,7 +45,7 @@ class Tester:
         all_labels = torch.cat(all_labels).numpy()
         scores = np.array([func(all_labels,all_outputs) if func != spearmanr else func(all_labels,all_outputs).statistic for func in self.funcs])
 
-        return scores
+        return scores, all_labels, all_outputs
 
 class Engine:
     def __init__(self, model, criterion, optimizer, device, accumulation_steps, arrhenius=False, regularisation = 0.0):

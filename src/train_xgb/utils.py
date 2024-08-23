@@ -21,7 +21,17 @@ def xgb(fold, seed_list = [42], verbose = True, params: dict = dict()):
   if verbose:
     for func in funcs:
       print(f"{func.__name__}: {res_mean[funcs.index(func)]}")
-  return res_mean, res_std
+  return res_mean, res_std, y_pred
+
+def save_results(path, df, labels, preds):
+    df = df.copy()
+
+    # Add these as new columns to the dataframe
+    df['actual_conductivity'] = labels
+    df['predicted_conductivity'] = preds
+
+    # Save the dataframe as a .csv file
+    df.to_csv(path, index=False)
 
 def logger(data_dict:dict, csv_file_path:str, use_wandb: bool= False):
   if use_wandb: wandb.log(data_dict)

@@ -7,10 +7,10 @@ data_cleaning = {
 preprocess_xgb = {
   "data_dir_name": "data",
   "input_data_name": "cleaned_data.xlsx",
-  "output_data_name": "chemberta_xgb_colSMILES.pickle",
+  "output_data_name": "polybert_xgb_chemberta.pickle",
   "cats": ["psmiles","salt smiles"], # psmiles for polyBERT, long_smiles for morgan
   "conts": ["mw","molality", "temperature_K"],
-  "drop_columns": ["raw_psmiles","long_smiles","temperature","monomer_smiles"],
+  "drop_columns": ["raw_psmiles","monomer_smiles","temperature","long_smiles"],
   "train_ratio":0.8,
   "val_ratio":0.1,
   "nfolds": 10,
@@ -33,18 +33,18 @@ preprocess_ffn = {
   "salt_encoding": "morgan", # {"morgan", "chemberta_tokneizer"}
   "salt_model_name": '',
   "salt_col": "salt smiles",
-  "conts": ["mw","molality","temperature"],
+  "conts": ["mw","molality","temperature_K"],
   "fpSize": 128,
   "verbose":False
 }
 
 xgb_cv = {
-  "use_wandb" : True,
-  "best_params": "zccheng97-nanyang-technological-university-singapore/xgb_chemberta_colSMILES_hpsweep/7do0v6ii", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>"
+  "use_wandb" : False,
+  "best_params": "", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>"
   "data_dir_name": "data",
   "results_dir_name": "results",
-  "input_data_name": "chemberta_xgb_colSMILES.pickle",
-  "output_name": "xgb_chemberta_colSMILES_seed42_best2.csv",
+  "input_data_name": "polybert_xgb_chemberta.pickle",
+  "output_name": "polybert_xgb_chemberta_seed42", # no suffix
   # "seed_list":[42,3,34,43,83], 
   "seed_list":[42], 
   "verbose": True,
@@ -108,14 +108,14 @@ xgb_sweep = {
 }
 
 ffn_cv = {
-  "use_wandb" : False,
+  "use_wandb" : True,
   "best_params": "", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>."
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "morgan_ffn_morgan.pickle",
-  "output_name": "morgan_ffn_morgan_DUMMY", # remember to not include .csv for this particular variable, used to name the model file also
-  "modes": ["train", "test"], # can be either "train", "test" or both
+  "output_name": "morgan_ffn_morgan", # remember to not include .csv for this particular variable, used to name the model file also
+  "modes": ["train","test"], # can be either "train", "test" or both
   "arrhenius": False,
   "regularisation": 0,
 
@@ -128,19 +128,20 @@ ffn_cv = {
   "poly_model_name": '', # blank if not using trained embeddings
   "conts": ["mw","molality","temperature_K"], # include temp_K column even if using Arrhenius
   "temperature_name": "temperature_K",
-  "fold_list":[0], 
+  "fold_list":[0,1,2,3,4,5,6,7,8,9], 
   "seed": 42,
   "device": "cuda",
   "num_polymer_features": 128, # 600 for polybert, 128 for morgan
   "num_salt_features": 128, # 768 for chemberta, 128 for morgan
-  "num_continuous_vars": 1, # change to 2 if using Arrhenius mode, otherwise 3 cont variables
-  "data_fraction": .01, # use something small like 0.01 if you want to do quick run for error checking
+  "num_continuous_vars": 3, # change to 2 if using Arrhenius mode, otherwise 3 cont variables
+  "filter_condition": "", # applies to both sets, leave blank if no conditions to be imposed
+  "data_fraction":1, # use something small like 0.01 if you want to do quick run for error checking
 
   # tunable hyperparameters
   "batch_size": 16, # cannot exceed 32 atm due to memory limits
   "accumulation_steps": 2,
   "hidden_size": 2048,
-  "num_hidden_layers": 1,
+  "num_hidden_layers": 2,
   "dropout": 0.1,
   "activation_fn": "relu",
   "init_method": "glorot",
@@ -153,7 +154,7 @@ ffn_cv = {
   'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR"}
   'warmup_steps': 100,
-  "epochs": 1,
+  "epochs": 30,
   }
 
 ffn_sweep = {
@@ -217,6 +218,9 @@ ffn_sweep = {
         },
         'num_continuous_vars': {
             'value': 3
+        },
+        'filter_condition': {
+            'value': ""
         },
         'data_fraction': {
             'value': 1

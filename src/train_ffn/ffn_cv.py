@@ -9,7 +9,7 @@ import torch
 
 from .train_ffn import train_ffn
 from .test_ffn import test_ffn
-from .utils import seed_everything, logger, load_best_params
+from .utils import seed_everything, logger, load_best_params, save_results
 
 def ffn_cv(args):
     script_dir = Path(__file__).resolve().parent
@@ -28,6 +28,7 @@ def ffn_cv(args):
         output_log_path = results_dir / f"{args.output_name}_fold{fold}.csv"
         output_log_test_path = results_dir / f"{args.output_name}_testscores.csv"
         output_model_path = models_dir / f"{args.output_name}_fold{fold}.pt"
+        output_data_path = results_dir / f"{args.output_name}_fold{fold}_data.csv"
         print(f"Currently running fold: {fold}")
 
         datasplit = data[fold]
@@ -55,7 +56,7 @@ def ffn_cv(args):
                         name=f"Fold {fold} Test", 
                         config=params.as_dictionary) 
 
-            test_scores = test_ffn(datasplit,params, output_model_path)
+            test_scores, output_df,test_labels, test_preds = test_ffn(datasplit,params, output_model_path)
             data_dict = {
             "fold": fold,
             "mae_mean": test_scores[0],
@@ -70,5 +71,6 @@ def ffn_cv(args):
             "test_labels": datasplit.label_counts[2]}
 
             logger(data_dict, output_log_test_path, args.use_wandb)
+            save_results(output_data_path, output_df, test_labels, test_preds)
             if args.use_wandb: wandb.finish()
     

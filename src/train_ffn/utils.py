@@ -3,7 +3,18 @@ import numpy as np
 import torch
 import csv
 import wandb
+import pandas as pd
 from transformers import get_linear_schedule_with_warmup
+
+def save_results(path, df, labels, preds):
+    df = df.copy()
+
+    # Add these as new columns to the dataframe
+    df['actual_conductivity'] = labels
+    df['predicted_conductivity'] = preds
+
+    # Save the dataframe as a .csv file
+    df.to_csv(path, index=False)
 
 def seed_everything(seed: int) -> None:
     random.seed(seed)

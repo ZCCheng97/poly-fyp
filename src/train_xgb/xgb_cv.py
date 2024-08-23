@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import wandb
 
-from .utils import xgb, logger, load_best_params
+from .utils import xgb, logger, load_best_params, save_results
 
 def xgb_cv(args):
   script_dir = Path(__file__).resolve().parent
@@ -12,7 +12,8 @@ def xgb_cv(args):
   data_dir = script_dir.parent.parent / args.data_dir_name
   results_dir = script_dir.parent.parent / args.results_dir_name
   input_data_path = data_dir / args.input_data_name
-  output_path = results_dir / args.output_name
+  output_path = results_dir / f"{args.output_name}.csv"
+  
 
   with open(input_data_path, 'rb') as f:
      data = pickle.load(f) # object of list of Datasplit Classes
@@ -22,7 +23,7 @@ def xgb_cv(args):
 
   for fold in tqdm(range(nfolds)):
     print(f"Currently running fold: {fold}")
-
+    output_data_path = results_dir / f"{args.output_name}_fold{fold}_data.csv"  
     if args.use_wandb: 
       project = args.output_name.split(".")[0]
 
@@ -34,7 +35,7 @@ def xgb_cv(args):
     datasplit = data[fold] # object of DataSplit class.
     params = load_best_params(args.best_params, verbose = args.verbose)
 
-    res_mean,res_std = xgb(datasplit, seed_list = args.seed_list, verbose = args.verbose, params=params)
+    res_mean,res_std, y_pred = xgb(datasplit, seed_list = args.seed_list, verbose = args.verbose, params=params)
     data_dict = {
         "fold": fold,
         "mae_mean": res_mean[0],
@@ -53,6 +54,7 @@ def xgb_cv(args):
         "test_labels": datasplit.label_counts[2]
     }
     logger(data_dict, output_path, args.use_wandb)
+    save_results(output_data_path, datasplit.x_test, datasplit.y_test, y_pred)
     fold_means.append(res_mean)
     if args.use_wandb: wandb.finish()
 
