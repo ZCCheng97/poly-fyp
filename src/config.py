@@ -7,29 +7,29 @@ data_cleaning = {
 preprocess_xgb = {
   "data_dir_name": "data",
   "input_data_name": "cleaned_data.xlsx",
-  "output_data_name": "polybert_xgb_chemberta.pickle",
+  "output_data_name": "polybert_xgb_chemberta_10fold_90_10.pickle",
   "cats": ["psmiles","salt smiles"], # psmiles for polyBERT, long_smiles for morgan
   "conts": ["mw","molality", "temperature_K"],
-  "drop_columns": ["raw_psmiles","monomer_smiles","temperature","long_smiles"],
-  "train_ratio":0.8,
-  "val_ratio":0.1,
+  "drop_columns": ["raw_psmiles","long_smiles","temperature","monomer_smiles"],
+  "train_ratio":0.9,
+  "val_ratio":0.05,
   "nfolds": 10,
-  "polymer_use_fp": "polybert", # {"polybert", "morgan", "morgan_monomer","none"}
+  "polymer_use_fp": "polybert", # {"polybert", "morgan", "morgan_monomer"}
   "salt_use_fp": "chemberta", # {"morgan", "chemberta"}
   "fpSize": 128,
-  "verbose":False
+  "verbose":True
 }
 
 preprocess_ffn = {
   "data_dir_name": "data",
   "input_data_name": "cleaned_data.xlsx",
-  "output_data_name": "polybert_ffn_morgan.pickle", # {poly_encoding}_{ffn/xgb}_{salt_encoding}_{arr/None}.pickle
-  "train_ratio":0.8,
-  "val_ratio":0.1,
+  "output_data_name": "polybert_ffn_morgan_10fold_90_10.pickle", # {poly_encoding}_{ffn/xgb}_{salt_encoding}_{arr/None}.pickle
+  "train_ratio":0.9,
+  "val_ratio":0.05,
   "nfolds": 10,
   "poly_encoding": "polybert_tokenizer", # {"polybert_tokenizer", "morgan"}
   "poly_model_name": 'kuelumbus/polyBERT', # {'kuelumbus/polyBERT', }
-  "poly_col": "long_smiles",
+  "poly_col": "psmiles",
   "salt_encoding": "morgan", # {"morgan", "chemberta_tokneizer"}
   "salt_model_name": '',
   "salt_col": "salt smiles",
@@ -43,8 +43,8 @@ xgb_cv = {
   "best_params": "", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>"
   "data_dir_name": "data",
   "results_dir_name": "results",
-  "input_data_name": "polybert_xgb_chemberta.pickle",
-  "output_name": "polybert_xgb_chemberta_seed42", # no suffix
+  "input_data_name": "polybert_xgb_chemberta_10fold_90_10.pickle",
+  "output_name": "polybert_xgb_chemberta_10fold_90_10_seed42", # no suffix
   # "seed_list":[42,3,34,43,83], 
   "seed_list":[42], 
   "verbose": True,
@@ -161,8 +161,8 @@ ffn_sweep = {
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "polybert_ffn_morgan.pickle",
-  "output_name": "polybert_ffn_morgan_sweep_lr_BS_hiddensize",
+  "input_data_name": "polybert_ffn_morgan_10fold_90_10.pickle",
+  "output_name": "polybert_ffn_morgan_10fold_90_10_sweep_lr_BS_hiddensize",
   "fold": 0, # the fold index
   "rounds": 27,
   "seed": 42, 

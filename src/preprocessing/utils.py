@@ -32,11 +32,11 @@ def stratified_split(df, train_ratio=0.8, val_ratio=0.1, nfolds = 10,verbose = T
   label_col = "smiles"
 
   df_c_len = len(df)
-  train_ratio = int(train_ratio*10)
-  val_ratio = int(val_ratio*10)
+  train_ratio = int(train_ratio*100)
+  val_ratio = int(val_ratio*100)
 
-  train_len = df_c_len//10*train_ratio
-  val_len = df_c_len//10*val_ratio
+  train_len = df_c_len//100*train_ratio
+  val_len = df_c_len//100*val_ratio
   test_len = df_c_len - train_len - val_len
 
   poly_smiles_counts = df[label_col].value_counts()
