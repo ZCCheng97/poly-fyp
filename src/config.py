@@ -23,12 +23,12 @@ preprocess_xgb = {
 preprocess_ffn = {
   "data_dir_name": "data",
   "input_data_name": "cleaned_data.xlsx",
-  "output_data_name": "morgan_ffn_morgan.pickle", # {poly_encoding}_{ffn/xgb}_{salt_encoding}_{arr/None}.pickle
+  "output_data_name": "polybert_ffn_morgan.pickle", # {poly_encoding}_{ffn/xgb}_{salt_encoding}_{arr/None}.pickle
   "train_ratio":0.8,
   "val_ratio":0.1,
   "nfolds": 10,
-  "poly_encoding": "morgan", # {"polybert_tokenizer", "morgan"}
-  "poly_model_name": '', # {'kuelumbus/polyBERT', }
+  "poly_encoding": "polybert_tokenizer", # {"polybert_tokenizer", "morgan"}
+  "poly_model_name": 'kuelumbus/polyBERT', # {'kuelumbus/polyBERT', }
   "poly_col": "long_smiles",
   "salt_encoding": "morgan", # {"morgan", "chemberta_tokneizer"}
   "salt_model_name": '',
@@ -114,7 +114,7 @@ ffn_cv = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "morgan_ffn_morgan.pickle",
-  "output_name": "morgan_ffn_morgan", # remember to not include .csv for this particular variable, used to name the model file also
+  "output_name": "morgan_ffn_morgan_seed42", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train","test"], # can be either "train", "test" or both
   "arrhenius": False,
   "regularisation": 0,
@@ -161,10 +161,10 @@ ffn_sweep = {
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "morgan_ffn_morgan.pickle",
-  "output_name": "morgan_ffn_morgan_sweeps",
+  "input_data_name": "polybert_ffn_morgan.pickle",
+  "output_name": "polybert_ffn_morgan_sweep_lr_BS_hiddensize",
   "fold": 0, # the fold index
-  "rounds": 36,
+  "rounds": 27,
   "seed": 42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
@@ -175,7 +175,7 @@ ffn_sweep = {
     },
     "parameters": {
         'use_wandb' : {
-            'value': False # do not change this value. Passed to train_ffn so it does not use wandb
+            'value': True # do not change this value. Passed to train_ffn so it does not use wandb
         },
         "arrhenius": {
             'value': False
@@ -202,16 +202,16 @@ ffn_sweep = {
             'value': 'cuda'
         },
         'poly_model_name': {
-            'value': ''
+            'value': 'kuelumbus/polyBERT'
         },
         'poly_encoding': {
-            'value': 'morgan'
+            'value': 'polybert_tokenizer'
         },
         'poly_col': {
-            'value': 'long_smiles'
+            'value': 'psmiles'
         },
         'num_polymer_features': {
-            'value': 128
+            'value': 600
         },
         'num_salt_features': {
             'value': 128
@@ -229,13 +229,13 @@ ffn_sweep = {
             'value': 16
         },
         'accumulation_steps': {
-            'values': [2,4,8]
+            'values': [4,8,16]
         },
         'hidden_size': {
-            'values': [1024,2048]
+            'values': [512,1024,2048]
         },
         'num_hidden_layers': {
-            'values': [1,2]
+            'value': 1
         },
         'dropout': {
             'value': 0.1
@@ -262,7 +262,7 @@ ffn_sweep = {
             'value': 1
         },
         'lr': {
-            'values': [1e-4, 5e-5,1e-5]
+            'values': [1e-4,5e-5,1e-5]
         },
         'optimizer': {
             'value': 'AdamW'
@@ -274,7 +274,7 @@ ffn_sweep = {
             'value': 200
         },
         'epochs': {
-            'value': 25
+            'value': 30
         },
     }
 },

@@ -67,5 +67,5 @@ def train_ffn(tabularsplit,args, trained_model_path, log_csv_path, save = True) 
         scheduler.step(val_loss)
         data_dict = {"Epoch": epoch+1, "Train_loss": train_loss, "Valid_loss": val_loss} 
         
-        if save: logger(data_dict, log_csv_path, args.use_wandb)
+        logger(data_dict, log_csv_path, args.use_wandb)
     return current_best_loss
