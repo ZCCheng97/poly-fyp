@@ -7,7 +7,7 @@ data_cleaning = {
 preprocess_xgb = {
   "data_dir_name": "data",
   "input_data_name": "cleaned_data.xlsx",
-  "output_data_name": "polybert_xgb_chemberta_10fold_90_10.pickle",
+  "output_data_name": "polybert_xgb_morgan_10fold_90_10.pickle",
   "cats": ["psmiles","salt smiles"], # psmiles for polyBERT, long_smiles for morgan
   "conts": ["mw","molality", "temperature_K"],
   "drop_columns": ["raw_psmiles","long_smiles","temperature","monomer_smiles"],
@@ -15,7 +15,7 @@ preprocess_xgb = {
   "val_ratio":0.05,
   "nfolds": 10,
   "polymer_use_fp": "polybert", # {"polybert", "morgan", "morgan_monomer"}
-  "salt_use_fp": "chemberta", # {"morgan", "chemberta"}
+  "salt_use_fp": "morgan", # {"morgan", "chemberta"}
   "fpSize": 128,
   "verbose":True
 }
@@ -35,7 +35,7 @@ preprocess_ffn = {
   "salt_col": "salt smiles",
   "conts": ["mw","molality","temperature_K"],
   "fpSize": 128,
-  "verbose":False
+  "verbose":True
 }
 
 xgb_cv = {
@@ -153,7 +153,7 @@ ffn_cv = {
   'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR"}
   'warmup_steps': 100,
-  "epochs": 2,
+  "epochs": 25,
   }
 
 ffn_sweep = {

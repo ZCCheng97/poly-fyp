@@ -20,6 +20,8 @@ def data_cleaning(args):
   .pipe(fill_mw)\
   .pipe(add_temperature_K)
   
+  new_df = new_df.drop_duplicates()
   new_df.to_excel(output_file_name,index=False)
+  
   print(f"Cleaning completed. Sample size of {len(new_df)}")
   return new_df

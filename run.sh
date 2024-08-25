@@ -1,3 +1,3 @@
 cd src
 
-python main.py ffn_sweep
+python main.py preprocess_xgb preprocess_ffn
