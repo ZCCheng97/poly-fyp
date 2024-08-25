@@ -5,11 +5,8 @@ from torch.utils.data import Dataset
 
 class FFNDataset(Dataset):
     def __init__(self, x,y,args):
-        self.comb = pd.concat([x, y.rename('conductivity')], axis=1)
-        if args.filter_condition:
-            self.comb = self.comb.query(args.filter_condition)
 
-        self.df, self.y = self.comb.drop(columns='conductivity'), self.comb['conductivity']
+        self.df, self.y = x,y
         self.args = args
         self.indices = self._get_random_indices()
 

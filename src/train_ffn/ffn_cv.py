@@ -56,7 +56,7 @@ def ffn_cv(args):
                         name=f"Fold {fold} Test", 
                         config=params.as_dictionary) 
 
-            test_scores, output_df,test_labels, test_preds = test_ffn(datasplit,params, output_model_path)
+            test_scores, test_indices,test_labels, test_preds = test_ffn(datasplit,params, output_model_path)
             data_dict = {
             "fold": fold,
             "mae_mean": test_scores[0],
@@ -70,7 +70,9 @@ def ffn_cv(args):
             "val_labels": datasplit.label_counts[1],
             "test_labels": datasplit.label_counts[2]}
 
+            test_x = datasplit.x_test_orig.iloc[test_indices] if args.data_fraction < 1 else datasplit.x_test_orig
+
             logger(data_dict, output_log_test_path, args.use_wandb)
-            save_results(output_data_path, output_df, test_labels, test_preds)
+            save_results(output_data_path, test_x, test_labels, test_preds)
             if args.use_wandb: wandb.finish()
     

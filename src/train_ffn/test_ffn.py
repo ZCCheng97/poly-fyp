@@ -41,4 +41,4 @@ def test_ffn(tabularsplit, args, trained_model_path) -> float:
     scores, labels, preds = engine(test_loader)
     
 
-    return scores, test_dataset.df,labels,preds
+    return scores,test_dataset.indices,labels,preds

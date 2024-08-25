@@ -113,8 +113,8 @@ ffn_cv = {
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "morgan_ffn_morgan.pickle",
-  "output_name": "morgan_ffn_morgan_seed42", # remember to not include .csv for this particular variable, used to name the model file also
+  "input_data_name": "polybert_ffn_morgan_10fold_90_10.pickle",
+  "output_name": "polybert_ffn_morgan_10fold_90_10", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train","test"], # can be either "train", "test" or both
   "arrhenius": False,
   "regularisation": 0,
@@ -123,25 +123,24 @@ ffn_cv = {
   "salt_col": "salt smiles", # matches column name in df
   "salt_encoding": "morgan", # matches column name in df, use "chemberta_tokenizer" for encoding, "morgan" for fp
   "salt_model_name": '', # 'seyonec/ChemBERTa-zinc-base-v1' for Chemberta, blank if not using trained embeddings
-  'poly_col': "long_smiles",# matches column name in df
-  "poly_encoding": "morgan", # matches column name in df, use "polybert_tokenizer" for encoding, "morgan" for fp
-  "poly_model_name": '', # blank if not using trained embeddings
+  'poly_col': "psmiles",# matches column name in df
+  "poly_encoding": "polybert_tokenizer", # matches column name in df, use "polybert_tokenizer" for encoding, "morgan" for fp
+  "poly_model_name": 'kuelumbus/polyBERT', # 'kuelumbus/polyBERT' if using polyBERT, blank if not using trained embeddings
   "conts": ["mw","molality","temperature_K"], # include temp_K column even if using Arrhenius
   "temperature_name": "temperature_K",
   "fold_list":[0,1,2,3,4,5,6,7,8,9], 
   "seed": 42,
   "device": "cuda",
-  "num_polymer_features": 128, # 600 for polybert, 128 for morgan
+  "num_polymer_features": 600, # 600 for polybert, 128 for morgan
   "num_salt_features": 128, # 768 for chemberta, 128 for morgan
   "num_continuous_vars": 3, # change to 2 if using Arrhenius mode, otherwise 3 cont variables
-  "filter_condition": "", # applies to both sets, leave blank if no conditions to be imposed
-  "data_fraction":1, # use something small like 0.01 if you want to do quick run for error checking
+  "data_fraction": 1, # use something small like 0.01 if you want to do quick run for error checking
 
   # tunable hyperparameters
-  "batch_size": 16, # cannot exceed 32 atm due to memory limits
-  "accumulation_steps": 2,
-  "hidden_size": 2048,
-  "num_hidden_layers": 2,
+  "batch_size": 128, # cannot exceed 32 atm due to memory limits
+  "accumulation_steps": 1,
+  "hidden_size": 1024,
+  "num_hidden_layers": 1,
   "dropout": 0.1,
   "activation_fn": "relu",
   "init_method": "glorot",
@@ -150,11 +149,11 @@ ffn_cv = {
   "encoder_init_lr" : 1e-6, # only passed to initialise_optimiser
   "salt_freeze_layers": 12,
   "salt_encoder_init_lr": 1e-6, # only passed to initialise_optimiser
-  "lr": 1e-4,
+  "lr": 5e-5,
   'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR"}
   'warmup_steps': 100,
-  "epochs": 30,
+  "epochs": 20,
   }
 
 ffn_sweep = {

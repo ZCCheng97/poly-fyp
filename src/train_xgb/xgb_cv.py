@@ -54,7 +54,7 @@ def xgb_cv(args):
         "test_labels": datasplit.label_counts[2]
     }
     logger(data_dict, output_path, args.use_wandb)
-    save_results(output_data_path, datasplit.x_test, datasplit.y_test, y_pred)
+    save_results(output_data_path, datasplit.x_test_orig, datasplit.y_test_orig, y_pred)
     fold_means.append(res_mean)
     if args.use_wandb: wandb.finish()
 

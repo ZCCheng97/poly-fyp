@@ -32,18 +32,19 @@ class TorchDataset:
     df_list, label_counts_list = stratified_split(self.df, train_ratio=args.train_ratio, val_ratio=args.val_ratio, nfolds = args.nfolds,verbose = args.verbose)
     for fold in tqdm(range(args.nfolds), desc = "Curr Fold"):
       train_df, val_df, test_df = df_list[fold]
-      train_df, val_df, test_df = standardise(train_df, val_df, test_df, conts = args.conts)
+      train_dfs, val_dfs, test_dfs = standardise(train_df, val_df, test_df, conts = args.conts)
 
-      curr_fold = TabularSplit(train_df,val_df,test_df, label_counts = label_counts_list[fold])
+      curr_fold = TabularSplit(train_dfs,val_dfs,test_dfs, test_df,label_counts = label_counts_list[fold])
       self.folds.append(curr_fold)
     return self.folds
 
 class TabularSplit:
-  def __init__(self,tr,val,te, label_counts):
+  def __init__(self,tr,val,te, te_orig,label_counts):
       self.label_counts = label_counts
       
       self.x_train, self.y_train = xy_split(tr)
       self.x_val, self.y_val = xy_split(val)
+      self.x_test_orig, self.y_test_orig = xy_split(te_orig)
       self.x_test, self.y_test = xy_split(te)
 
 class TabularDataset:
@@ -76,7 +77,7 @@ class TabularDataset:
 
       train_dfs, val_dfs, test_dfs = standardise(train_df, val_df, test_df, conts = args.conts, keep_cols=False)
 
-      curr_fold = TabularSplit(train_dfs,val_dfs,test_dfs, label_counts = label_counts_list[fold])
+      curr_fold = TabularSplit(train_dfs,val_dfs,test_dfs, test_df,label_counts = label_counts_list[fold])
 
       self.folds.append(curr_fold)
     return self.folds
