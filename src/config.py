@@ -108,13 +108,13 @@ xgb_sweep = {
 }
 
 ffn_cv = {
-  "use_wandb" : False,
+  "use_wandb" : True,
   "best_params": "", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>."
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_10fold_90_10.pickle",
-  "output_name": "dummy", # remember to not include .csv for this particular variable, used to name the model file also
+  "output_name": "polybert_ffn_morgan_10fold_90_10", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train","test"], # can be either "train", "test" or both
   "arrhenius": False,
   "regularisation": 0,
@@ -128,29 +128,29 @@ ffn_cv = {
   "poly_model_name": 'kuelumbus/polyBERT', # 'kuelumbus/polyBERT' if using polyBERT, blank if not using trained embeddings
   "conts": ["mw","molality","temperature_K"], # include temp_K column even if using Arrhenius
   "temperature_name": "temperature_K",
-  "fold_list":[5], 
+  "fold_list":[0,1,2,3,4,5,6,7,8,9], 
   "seed": 42,
   "device": "cuda",
   "num_polymer_features": 600, # 600 for polybert, 128 for morgan
   "num_salt_features": 128, # 768 for chemberta, 128 for morgan
   "num_continuous_vars": 3, # change to 2 if using Arrhenius mode, otherwise 3 cont variables
-  "data_fraction": .01, # use something small like 0.01 if you want to do quick run for error checking
+  "data_fraction": 1, # use something small like 0.01 if you want to do quick run for error checking
 
   # tunable hyperparameters
-  "batch_size": 16, # cannot exceed 32 atm due to memory limits
-  "accumulation_steps": 2,
+  "batch_size": 128, # cannot exceed 32 atm due to memory limits
+  "accumulation_steps": 1,
   "hidden_size": 1024,
   "num_hidden_layers": 1,
   "dropout": 0.1,
   "activation_fn": "relu",
   "init_method": "glorot",
   "output_size": 1, # change to 2 if using Arrhenius mode, otherwise 1
-  "freeze_layers": 0, # by default 12 layers in polyBERT
+  "freeze_layers": 12, # by default 12 layers in polyBERT
   "encoder_init_lr" : 1e-6, # only passed to initialise_optimiser
   "salt_freeze_layers": 12,
   "salt_encoder_init_lr": 1e-6, # only passed to initialise_optimiser
   "lr": 5e-5,
-  'optimizer': "AdamW_ratedecay_4_4_4", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
+  'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR"}
   'warmup_steps': 100,
   "epochs": 2,
@@ -261,7 +261,7 @@ ffn_sweep = {
             'values': [1e-4,5e-5,1e-5]
         },
         'optimizer': {
-            'value': '"AdamW_ratedecay_4_4_4"'
+            'value': "AdamW"
         },
         'scheduler': {
             'value': "ReduceLROnPlateau"

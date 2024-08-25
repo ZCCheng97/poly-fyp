@@ -6,14 +6,15 @@ import csv
 from tqdm import tqdm
 import wandb
 
-def xgb(fold, seed_list = [42], verbose = True, params: dict = dict()):
+def xgb(fold, seed_list = [42], verbose = True, params: dict = dict(), sweep = False):
   funcs = [mean_absolute_error,mean_squared_error, spearmanr,r2_score]
   outputs = []
   for seed in tqdm(seed_list, desc= "Seed"):
     model = XGBRegressor(seed = seed, subsample = 0.8) if not params else XGBRegressor(seed = seed, subsample = 0.8,**params)
     model.fit(fold.x_train,fold.y_train)
-    y_pred = model.predict(fold.x_test)
-    res = [func(fold.y_test,y_pred) if func != spearmanr else func(fold.y_test,y_pred).statistic for func in funcs]
+    x_test, y_test = fold.x_test, fold.y_test if not sweep else fold.x_val,fold.y_val
+    y_pred = model.predict(x_test)
+    res = [func(y_test,y_pred) if func != spearmanr else func(y_test,y_pred).statistic for func in funcs]
     outputs.append(res)
   outputs = np.array(outputs)
   res_mean = np.mean(outputs, axis = 0)
