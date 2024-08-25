@@ -34,15 +34,26 @@ def arrhenius_score(outputs, temperatures):
     return conductivity.unsqueeze(1) 
 
 def initialize_optimizer(args, model):
+    optimizer_params = list()
     if args.optimizer == "AdamW":
-       return torch.optim.AdamW([{'params': model.ffn.parameters(), 'lr': args.lr}])
-    if args.optimizer == "AdamW_ratedecay_4_4_4":
-        return torch.optim.AdamW([
-      {'params': model.polymerencoder.model.embeddings.parameters(), 'lr': args.encoder_init_lr}, 
-      {'params': model.polymerencoder.model.encoder.layer[:4].parameters(), 'lr': args.encoder_init_lr}, 
-    {'params': model.polymerencoder.model.encoder.layer[4:8].parameters(), 'lr': args.encoder_init_lr*1.75},  # Lower layers of polyencoder
-    {'params': model.polymerencoder.model.encoder.layer[8:].parameters(), 'lr': args.encoder_init_lr*3.5},  # Upper layers of polyencoder
-    {'params': model.ffn.parameters(), 'lr': args.lr} ])
+       optimizer_params.append({'params': model.ffn.parameters(), 'lr': args.lr})
+
+    if args.poly_model_name:
+        optimizer_params.extend([
+        {'params': model.polymerencoder.model.embeddings.parameters(), 'lr': args.encoder_init_lr}, 
+        {'params': model.polymerencoder.model.encoder.layer[:4].parameters(), 'lr': args.encoder_init_lr}, 
+        {'params': model.polymerencoder.model.encoder.layer[4:8].parameters(), 'lr': args.encoder_init_lr*1.75},  # Lower layers of polymerencoder
+        {'params': model.polymerencoder.model.encoder.layer[8:].parameters(), 'lr': args.encoder_init_lr*3.5} # Upper layers of polymerencoder
+        ])  
+    if args.salt_model_name:
+        optimizer_params.extend([
+        {'params': model.saltencoder.model.embeddings.parameters(), 'lr': args.encoder_init_lr}, 
+        {'params': model.saltencoder.model.encoder.layer[:4].parameters(), 'lr': args.encoder_init_lr}, 
+        {'params': model.saltencoder.model.encoder.layer[4:8].parameters(), 'lr': args.encoder_init_lr*1.75},  # Lower layers of saltencoder
+        {'params': model.saltencoder.model.encoder.layer[8:].parameters(), 'lr': args.encoder_init_lr*3.5} # Upper layers of saltencoder
+        ])  
+
+    return torch.optim.AdamW(optimizer_params)
 
 def initialize_scheduler(args,optimizer,num_training_steps):
     if args.scheduler == "ReduceLROnPlateau":
