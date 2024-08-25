@@ -6,7 +6,7 @@ from sklearn.preprocessing import StandardScaler
 
 def distribute_labels(labels, counts, target_per_group=820, n_groups=10):
     # Combine labels and counts into a list of tuples and sort by count descending
-    label_counts = sorted(zip(labels, counts), key=lambda x: x[1], reverse=True)
+    label_counts = sorted(zip(labels, counts), key=lambda x: (x[1],x[0]), reverse=True)
 
     # Initialize empty groups
     groups = [[] for _ in range(n_groups)]

@@ -153,7 +153,7 @@ ffn_cv = {
   'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR"}
   'warmup_steps': 100,
-  "epochs": 25,
+  "epochs": 2,
   }
 
 ffn_sweep = {
