@@ -161,9 +161,9 @@ ffn_sweep = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_10fold_90_10.pickle",
-  "output_name": "polybert_ffn_morgan_10fold_90_10_unfrozen_sweep_lr_BS_hiddensize",
+  "output_name": "polybert_ffn_morgan_10fold_90_10_unfrozen_sweep_layers_dropout_initlr",
   "fold": 0, # the fold index
-  "rounds": 1,
+  "rounds": 12,
   "seed": 42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
@@ -219,22 +219,22 @@ ffn_sweep = {
             'value': 3
         },
         'data_fraction': {
-            'value': .01
+            'value': 1
         },
         'batch_size': {
             'value': 16
         },
         'accumulation_steps': {
-            'value': 1
+            'value': 8
         },
         'hidden_size': {
-            'values': [1024,2048]
+            'value': 2048
         },
         'num_hidden_layers': {
-            'values': [1,2]
+            'values': [2,3]
         },
         'dropout': {
-            'value': 0.1
+            'values': [.3,.2,.1]
         },
         'activation_fn': {
             'value': "relu"
@@ -246,7 +246,7 @@ ffn_sweep = {
             'value': 0
         },
         'encoder_init_lr': {
-            'value': 1e-6
+            'values': [1e-6, 5e-6]
         },
         'salt_freeze_layers': {
             'value': 12
@@ -258,7 +258,7 @@ ffn_sweep = {
             'value': 1
         },
         'lr': {
-            'values': [1e-4,5e-5,1e-5]
+            'value': 1e-5
         },
         'optimizer': {
             'value': "AdamW"
@@ -270,7 +270,7 @@ ffn_sweep = {
             'value': 200
         },
         'epochs': {
-            'value': 2
+            'value': 25
         },
     }
 },

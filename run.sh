@@ -1,3 +1,3 @@
 cd src
 
-python main.py ffn_cv
+python main.py ffn_sweep
