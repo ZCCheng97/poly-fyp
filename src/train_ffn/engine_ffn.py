@@ -132,9 +132,9 @@ class Engine:
 
     def arrhenius_reg(self,lnA, Ea, reg_term=0.0):
         #fit terms and int range taken from experimental fit data and correlation between Ea and lnA
-        slope = 31.999564332937958
-        intercept = -10.412690081157656
-        int_range = 3.06
+        slope = 31.999279182429
+        intercept = -10.41255022673735
+        int_range = 3.050483449135184
         R = 8.63e-5
 
         #get expected value of lnA

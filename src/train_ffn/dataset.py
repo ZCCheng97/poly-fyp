@@ -28,10 +28,12 @@ class FFNDataset(Dataset):
 
         if self.args.salt_model_name:
             salt_inputs = self.df[f"{self.args.salt_col}_tokens"].iloc[idx]
-        else: 
+        elif self.args.salt_encoding == "morgan": 
             salt_fp = self.df['morgan_fp_'+self.args.salt_col].iloc[idx]
             salt_inputs = torch.tensor(salt_fp, dtype=torch.float32)
-        
+        elif not self.args.salt_encoding and not self.args.salt_model_name:
+            salt_inputs = torch.empty(0,)
+            
         continuous_vars = self.df[self.args.conts].iloc[idx]
         temperatures = self.df[self.args.temperature_name].iloc[idx]
         return {

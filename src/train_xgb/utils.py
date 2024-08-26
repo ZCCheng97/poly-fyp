@@ -12,7 +12,11 @@ def xgb(fold, seed_list = [42], verbose = True, params: dict = dict(), sweep = F
   for seed in tqdm(seed_list, desc= "Seed"):
     model = XGBRegressor(seed = seed, subsample = 0.8) if not params else XGBRegressor(seed = seed, subsample = 0.8,**params)
     model.fit(fold.x_train,fold.y_train)
-    x_test, y_test = fold.x_test, fold.y_test if not sweep else fold.x_val,fold.y_val
+    if not sweep:
+      x_test, y_test = fold.x_test, fold.y_test 
+    else: 
+      x_test, y_test = fold.x_val,fold.y_val
+      
     y_pred = model.predict(x_test)
     res = [func(y_test,y_pred) if func != spearmanr else func(y_test,y_pred).statistic for func in funcs]
     outputs.append(res)

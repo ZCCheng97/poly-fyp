@@ -32,7 +32,7 @@ def xgb_sweep(args):
 
             datasplit = data[fold] # object of DataSplit class.
 
-            res_mean, _= xgb(datasplit, seed_list = args.seed_list, verbose = args.verbose, params = wandb_config, sweep = True)
+            res_mean, _, _= xgb(datasplit, seed_list = args.seed_list, verbose = args.verbose, params = wandb_config, sweep = True)
             fold_means.append(res_mean)
 
       mean_of_fold_means = np.mean(np.array(fold_means),axis = 0)
