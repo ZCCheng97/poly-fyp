@@ -7,7 +7,7 @@ data_cleaning = {
 preprocess_xgb = {
   "data_dir_name": "data",
   "input_data_name": "cleaned_data.xlsx",
-  "output_data_name": "polybert_xgb_chemberta_10fold_90_10.pickle",
+  "output_data_name": "morgan_xgb_chemberta_10fold_90_10.pickle",
   "cats": ["psmiles","salt smiles"], # psmiles for polyBERT, long_smiles for morgan
   "conts": ["mw","molality", "temperature_K"],
   "drop_columns": ["raw_psmiles","monomer_smiles","temperature","long_smiles"],
@@ -43,8 +43,8 @@ xgb_cv = {
   "best_params": "", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>"
   "data_dir_name": "data",
   "results_dir_name": "results",
-  "input_data_name": "polybert_xgb_morgan_10fold_90_10.pickle",
-  "output_name": "polybert_xgb_chemberta_10fold_90_10_seed42", # no suffix
+  "input_data_name": "morgan_monomer_xgb_morgan_10fold_90_10.pickle",
+  "output_name": "morgan_monomer_xgb_morgan_10fold_90_10_seed42", # no suffix
   # "seed_list":[42,3,34,43,83], 
   "seed_list":[42], 
   "verbose": False,
@@ -53,8 +53,8 @@ xgb_cv = {
 xgb_sweep = {
   "data_dir_name": "data",
   "results_dir_name": "results",
-  "input_data_name": "morgan_xgb_morgan_10fold_90_10.pickle",
-  "output_name": "morgan_xgb_morgan_10fold_90_10_hpsweep.csv",
+  "input_data_name": "morgan_monomer_xgb_morgan_10fold_90_10.pickle",
+  "output_name": "morgan_monomer_xgb_morgan_10fold_90_10_hpsweep.csv",
   "seed_list":[42], 
   'sweep_id': '', # to resume a sweep after stopping
   "params":{"n_estimators": 200,
@@ -151,8 +151,8 @@ ffn_cv = {
   "salt_encoder_init_lr": 1e-6, # only passed to initialise_optimiser
   "lr": 5e-5,
   'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
-  "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR"}
-  'warmup_steps': 100,
+  "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR", "CosineLR"}
+  'warmup_steps': 100, # Usually 6% for LinearLR, 3% of total training steps for CosineLR.
   "epochs": 20,
   }
 
@@ -161,7 +161,7 @@ ffn_sweep = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_10fold_90_10.pickle",
-  "output_name": "polybert_ffn_morgan_10fold_90_10_unfrozen_sweep_layers_dropout_initlr",
+  "output_name": "polybert_ffn_morgan_10fold_90_10_unfrozen_sweep_scheduler",
   "fold": 0, # the fold index
   "rounds": 12,
   "seed": 42, 
@@ -231,10 +231,10 @@ ffn_sweep = {
             'value': 2048
         },
         'num_hidden_layers': {
-            'values': [2,3]
+            'value': 2
         },
         'dropout': {
-            'values': [.3,.2,.1]
+            'value': .1
         },
         'activation_fn': {
             'value': "relu"
@@ -246,7 +246,7 @@ ffn_sweep = {
             'value': 0
         },
         'encoder_init_lr': {
-            'values': [1e-6, 5e-6]
+            'value': 1e-6
         },
         'salt_freeze_layers': {
             'value': 12
@@ -264,13 +264,13 @@ ffn_sweep = {
             'value': "AdamW"
         },
         'scheduler': {
-            'value': "ReduceLROnPlateau"
+            'values': ["CosineLR","LinearLR"]
         },
         'warmup_steps': {
-            'value': 200
+            'values': [50,100,150]
         },
         'epochs': {
-            'value': 25
+            'values': [25,30]
         },
     }
 },

@@ -4,7 +4,7 @@ import torch
 import csv
 import wandb
 import pandas as pd
-from transformers import get_linear_schedule_with_warmup
+from transformers import get_linear_schedule_with_warmup, get_cosine_schedule_with_warmup
 
 def save_results(path, df, labels, preds):
     df = df.copy()
@@ -60,6 +60,8 @@ def initialize_scheduler(args,optimizer,num_training_steps):
         return torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=5)
     elif args.scheduler == "LinearLR":
         return get_linear_schedule_with_warmup(optimizer, num_warmup_steps=args.warmup_steps, num_training_steps=num_training_steps)
+    elif args.scheduler == "CosineLR":
+        return get_cosine_schedule_with_warmup(optimizer, num_warmup_steps=args.warmup_steps, num_training_steps=num_training_steps)
 
 def logger(data_dict:dict, csv_file_path:str, use_wandb: bool= False):
   if use_wandb: wandb.log(data_dict)
