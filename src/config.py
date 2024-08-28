@@ -139,8 +139,8 @@ ffn_cv = {
   # tunable hyperparameters
   "batch_size": 16, # cannot exceed 32 atm due to memory limits
   "accumulation_steps": 8,
-  "hidden_size": 1024,
-  "num_hidden_layers": 1,
+  "hidden_size": 2048,
+  "num_hidden_layers": 2,
   "dropout": 0.1,
   "activation_fn": "relu",
   "init_method": "glorot",
@@ -152,8 +152,8 @@ ffn_cv = {
   "lr": 5e-5,
   'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR", "CosineLR"}
-  'warmup_steps': 100, # Usually 6% for LinearLR, 3% of total training steps for CosineLR.
-  "epochs": 20,
+  'warmup_steps': 20, # Usually 6% for LinearLR, 3% of total training steps for CosineLR.
+  "epochs": 30,
   }
 
 ffn_sweep = {
@@ -163,7 +163,7 @@ ffn_sweep = {
   "input_data_name": "polybert_ffn_morgan_10fold_90_10.pickle",
   "output_name": "polybert_ffn_morgan_10fold_90_10_unfrozen_sweep_scheduler",
   "fold": 0, # the fold index
-  "rounds": 6,
+  "rounds": 2,
   "seed": 42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
@@ -267,10 +267,10 @@ ffn_sweep = {
             'value': "CosineLR"
         },
         'warmup_steps': {
-            'values': [0,40,20]
+            'value': 10
         },
         'epochs': {
-            'values': [20,30]
+            'values': [30,20]
         },
     }
 },
