@@ -163,7 +163,7 @@ ffn_sweep = {
   "input_data_name": "polybert_ffn_morgan_10fold_90_10.pickle",
   "output_name": "polybert_ffn_morgan_10fold_90_10_unfrozen_sweep_scheduler",
   "fold": 0, # the fold index
-  "rounds": 8,
+  "rounds": 6,
   "seed": 42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
@@ -258,7 +258,7 @@ ffn_sweep = {
             'value': 1
         },
         'lr': {
-            'values': [1e-4,5e-5]
+            'value': 1e-4
         },
         'optimizer': {
             'value': "AdamW"
@@ -267,7 +267,7 @@ ffn_sweep = {
             'value': "CosineLR"
         },
         'warmup_steps': {
-            'values': [50,100]
+            'values': [0,40,20]
         },
         'epochs': {
             'values': [20,30]
