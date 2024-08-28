@@ -128,7 +128,7 @@ ffn_cv = {
   "poly_model_name": 'kuelumbus/polyBERT', # 'kuelumbus/polyBERT' if using polyBERT, blank if not using trained embeddings
   "conts": ["mw","molality","temperature_K"], # conts that are selected for modeling, include temp_K column even if using Arrhenius
   "temperature_name": "temperature_K",
-  "fold_list":[0], 
+  "fold_list":[9,8,7,6,5,4,3,2,1,0], 
   "seed": 42,
   "device": "cuda",
   "num_polymer_features": 600, # 600 for polybert, 128 for morgan
@@ -149,11 +149,11 @@ ffn_cv = {
   "encoder_init_lr" : 1e-6, # only passed to initialise_optimiser
   "salt_freeze_layers": 12,
   "salt_encoder_init_lr": 1e-6, # only passed to initialise_optimiser
-  "lr": 5e-5,
+  "lr": 1e-4,
   'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
-  "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR", "CosineLR"}
-  'warmup_steps': 20, # Usually 6% for LinearLR, 3% of total training steps for CosineLR.
-  "epochs": 30,
+  "scheduler": "CosineLR", # {"ReduceLROnPlateau", "LinearLR", "CosineLR"}
+  'warmup_steps': 10, # Usually 6% for LinearLR, 3% of total training steps for CosineLR.
+  "epochs": 20,
   }
 
 ffn_sweep = {
