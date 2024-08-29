@@ -23,17 +23,17 @@ preprocess_xgb = {
 preprocess_ffn = {
   "data_dir_name": "data",
   "input_data_name": "cleaned_data.xlsx",
-  "output_data_name": "polybert_ffn_morgan_10fold_90_10.pickle", # {poly_encoding}_{ffn/xgb}_{salt_encoding}_{arr/None}.pickle
+  "output_data_name": "polybert_ffn_morgan_arr_10fold_90_10.pickle", # {poly_encoding}_{ffn/xgb}_{salt_encoding}_{arr/None}.pickle
   "train_ratio":0.9,
   "val_ratio":0.05,
   "nfolds": 10,
   "poly_encoding": "polybert_tokenizer", # {"polybert_tokenizer", "morgan"}
-  "poly_model_name": 'kuelumbus/polyBERT', # {'kuelumbus/polyBERT', }
+  "poly_model_name": 'kuelumbus/polyBERT', # {'kuelumbus/polyBERT', ''}
   "poly_col": "psmiles",
   "salt_encoding": "morgan", # {"morgan", "chemberta_tokneizer"}
-  "salt_model_name": '',
+  "salt_model_name": '', # {'seyonec/ChemBERTa-zinc-base-v1',''}
   "salt_col": "salt smiles",
-  "conts": ["mw","molality","temperature_K"],
+  "conts": ["mw","molality"],
   "fpSize": 128,
   "verbose":True
 }
@@ -160,10 +160,10 @@ ffn_sweep = {
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "polybert_ffn_morgan_10fold_90_10.pickle",
-  "output_name": "polybert_ffn_morgan_10fold_90_10_unfrozen_sweep_scheduler",
+  "input_data_name": "polybert_ffn_morgan_arr_10fold_90_10.pickle",
+  "output_name": "polybert_ffn_morgan_arr_10fold_90_10_unfrozen_sweep",
   "fold": 0, # the fold index
-  "rounds": 2,
+  "rounds": 36,
   "seed": 42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
@@ -177,7 +177,7 @@ ffn_sweep = {
             'value': True # do not change this value. Passed to train_ffn so it does not use wandb
         },
         "arrhenius": {
-            'value': False
+            'value': True
         },
         "regularisation": {
             'value':0
@@ -216,7 +216,7 @@ ffn_sweep = {
             'value': 128
         },
         'num_continuous_vars': {
-            'value': 3
+            'value': 2
         },
         'data_fraction': {
             'value': 1
@@ -225,13 +225,13 @@ ffn_sweep = {
             'value': 16
         },
         'accumulation_steps': {
-            'value': 8
+            'values': [4,8,16]
         },
         'hidden_size': {
-            'value': 2048
+            'values': [1024,2048]
         },
         'num_hidden_layers': {
-            'value': 2
+            'values': [2,3]
         },
         'dropout': {
             'value': .1
@@ -255,10 +255,10 @@ ffn_sweep = {
             'value': 1e-6
         },
         'output_size': {
-            'value': 1
+            'value': 2
         },
         'lr': {
-            'value': 1e-4
+            'values': [1e-4,5e-5,1e-5]
         },
         'optimizer': {
             'value': "AdamW"
@@ -270,7 +270,7 @@ ffn_sweep = {
             'value': 10
         },
         'epochs': {
-            'values': [30,20]
+            'value': 25
         },
     }
 },
