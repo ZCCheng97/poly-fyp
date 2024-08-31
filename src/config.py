@@ -161,9 +161,9 @@ ffn_sweep = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_arr_10fold_90_10.pickle",
-  "output_name": "polybert_ffn_morgan_arr_10fold_90_10_unfrozen_sweep_accsteps_warmup",
+  "output_name": "polybert_ffn_morgan_arr_10fold_90_10_unfrozen_sweep_noscheduler",
   "fold": 0, # the fold index
-  "rounds": 6,
+  "rounds": 24,
   "seed": 42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
@@ -231,7 +231,7 @@ ffn_sweep = {
             'value': 2048
         },
         'num_hidden_layers': {
-            'value':2
+            'values':[2,3]
         },
         'dropout': {
             'value': .1
@@ -246,7 +246,7 @@ ffn_sweep = {
             'value': 0
         },
         'encoder_init_lr': {
-            'value': 1e-6
+            'values': [1e-6,5e-6]
         },
         'salt_freeze_layers': {
             'value': 12
@@ -258,19 +258,19 @@ ffn_sweep = {
             'value': 2
         },
         'lr': {
-            'value': 1e-4
+            'values': [1e-4,5e-5,1e-5]
         },
         'optimizer': {
             'value': "AdamW"
         },
         'scheduler': {
-            'value': "CosineLR"
+            'value': "ReduceLROnPlateau"
         },
         'warmup_steps': {
-            'values': [50,100,150]
+            'value': 10
         },
         'epochs': {
-            'value': 50
+            'value': 25
         },
     }
 },
