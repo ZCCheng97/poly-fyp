@@ -12,6 +12,7 @@ def preprocess_xgb(args):
   output_data_path = data_dir / args.output_data_name
 
   df = pd.read_excel(input_data_path)
+  df["psmiles_split"] = df.psmiles
   df = df.drop(columns = args.drop_columns)
   
   tabular_dataset = TabularDataset(df).process(args)

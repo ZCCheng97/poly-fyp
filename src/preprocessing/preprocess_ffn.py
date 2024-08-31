@@ -12,7 +12,7 @@ def preprocess_ffn(args):
   output_data_path = data_dir / args.output_data_name
 
   df = pd.read_excel(input_data_path)
-  
+  df["psmiles_split"] = df.psmiles
   torch_dataset = TorchDataset(df).process(args)
 
   with open(output_data_path, 'wb') as f:

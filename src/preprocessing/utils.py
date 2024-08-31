@@ -29,7 +29,7 @@ def categorify(df:pd.DataFrame, cats:List[str]) -> pd.DataFrame:
     return model_df
 
 def stratified_split(df, train_ratio=0.8, val_ratio=0.1, nfolds = 10,verbose = True) -> List[Tuple[pd.DataFrame]]:
-  label_col = "smiles"
+  label_col = "psmiles_split"
 
   df_c_len = len(df)
   train_ratio = int(train_ratio*100)
