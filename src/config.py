@@ -114,7 +114,7 @@ ffn_cv = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_90_10_new.pickle",
-  "output_name": "polybert_ffn_morgan_90_10_new_seed42", # remember to not include .csv for this particular variable, used to name the model file also
+  "output_name": "polybert_ffn_morgan_90_10_new_unfrozen_seed42", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train","test"], # can be either "train", "test" or both
   "arrhenius": False,
   "regularisation": 0,
@@ -140,16 +140,16 @@ ffn_cv = {
   "batch_size": 16, # cannot exceed 32 atm due to memory limits
   "accumulation_steps": 8,
   "hidden_size": 2048,
-  "num_hidden_layers": 1,
+  "num_hidden_layers": 2,
   "dropout": 0.1,
   "activation_fn": "relu",
   "init_method": "glorot",
   "output_size": 1, # change to 2 if using Arrhenius mode, otherwise 1
-  "freeze_layers": 12, # by default 12 layers in polyBERT
+  "freeze_layers": 0, # by default 12 layers in polyBERT
   "encoder_init_lr" : 1e-6, # only passed to initialise_optimiser
   "salt_freeze_layers": 12,
   "salt_encoder_init_lr": 1e-6, # only passed to initialise_optimiser
-  "lr": 5e-5,
+  "lr": 1e-5,
   'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR", "CosineLR"}
   'warmup_steps': 10, # Usually 6% for LinearLR, 3% of total training steps for CosineLR.
