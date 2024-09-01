@@ -23,7 +23,7 @@ preprocess_xgb = {
 preprocess_ffn = {
   "data_dir_name": "data",
   "input_data_name": "cleaned_data.xlsx",
-  "output_data_name": "polybert_ffn_morgan_90_10_new.pickle", # {poly_encoding}_{ffn/xgb}_{salt_encoding}_{arr/None}.pickle
+  "output_data_name": "polybert_ffn_morgan_arr_90_10_new.pickle", # {poly_encoding}_{ffn/xgb}_{salt_encoding}_{arr/None}.pickle
   "train_ratio":0.9,
   "val_ratio":0.05,
   "nfolds": 10,
@@ -33,7 +33,7 @@ preprocess_ffn = {
   "salt_encoding": "morgan", # {"morgan", "chemberta_tokenizer"}
   "salt_model_name": '', # {'seyonec/ChemBERTa-zinc-base-v1',''}
   "salt_col": "salt smiles",
-  "conts": ["mw","molality","temperature_K"],
+  "conts": ["mw","molality"],
   "fpSize": 128,
   "verbose":False
 }
@@ -113,10 +113,10 @@ ffn_cv = {
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "polybert_ffn_morgan_90_10_new.pickle",
-  "output_name": "polybert_ffn_morgan_90_10_new_unfrozen_seed42", # remember to not include .csv for this particular variable, used to name the model file also
+  "input_data_name": "polybert_ffn_morgan_arr_90_10_new.pickle",
+  "output_name": "polybert_ffn_morgan_arr_90_10_new_unfrozen_seed42", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train","test"], # can be either "train", "test" or both
-  "arrhenius": False,
+  "arrhenius": True,
   "regularisation": 0,
 
   # defines model architecture
@@ -133,7 +133,7 @@ ffn_cv = {
   "device": "cuda",
   "num_polymer_features": 600, # 600 for polybert, 128 for morgan
   "num_salt_features": 128, # 768 for chemberta, 128 for morgan
-  "num_continuous_vars": 3, # change to 2 if using Arrhenius mode, otherwise 3 cont variables
+  "num_continuous_vars": 2, # change to 2 if using Arrhenius mode, otherwise 3 cont variables
   "data_fraction": 1, # use something small like 0.01 if you want to do quick run for error checking
 
   # tunable hyperparameters
@@ -144,16 +144,16 @@ ffn_cv = {
   "dropout": 0.1,
   "activation_fn": "relu",
   "init_method": "glorot",
-  "output_size": 1, # change to 2 if using Arrhenius mode, otherwise 1
+  "output_size": 2, # change to 2 if using Arrhenius mode, otherwise 1
   "freeze_layers": 0, # by default 12 layers in polyBERT
-  "encoder_init_lr" : 1e-6, # only passed to initialise_optimiser
+  "encoder_init_lr" : 5e-6, # only passed to initialise_optimiser
   "salt_freeze_layers": 12,
   "salt_encoder_init_lr": 1e-6, # only passed to initialise_optimiser
-  "lr": 1e-5,
+  "lr": 1e-4,
   'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR", "CosineLR"}
   'warmup_steps': 10, # Usually 6% for LinearLR, 3% of total training steps for CosineLR.
-  "epochs": 25,
+  "epochs": 30,
   }
 
 ffn_sweep = {
