@@ -160,8 +160,8 @@ ffn_sweep = {
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "polybert_ffn_morgan_arr_10fold_90_10.pickle",
-  "output_name": "polybert_ffn_morgan_arr_10fold_90_10_unfrozen_sweep_noscheduler",
+  "input_data_name": "polybert_ffn_morgan_arr_90_10_new.pickle",
+  "output_name": "polybert_ffn_morgan_arr_90_10_new_unfrozen_sweep_noscheduler",
   "fold": 0, # the fold index
   "rounds": 24,
   "seed": 42, 
@@ -225,10 +225,10 @@ ffn_sweep = {
             'value': 16
         },
         'accumulation_steps': {
-            'values': [4,8]
+            'value': 8
         },
         'hidden_size': {
-            'value': 2048
+            'values': [1024,2048]
         },
         'num_hidden_layers': {
             'values':[2,3]
