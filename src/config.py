@@ -160,9 +160,9 @@ ffn_sweep = {
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "polybert_ffn_morgan_arr_10fold_90_10.pickle",
-  "output_name": "polybert_ffn_morgan_arr_10fold_90_10_unfrozen_sweep_noscheduler",
-  "fold": 0, # the fold index
+  "input_data_name": "polybert_ffn_morgan_80_20_new.pickle",
+  "output_name": "polybert_ffn_morgan_80_20_new_sweep",
+  "fold": 2, # the fold index
   "rounds": 54,
   "seed": 42, 
   'sweep_id': '', # to resume a sweep after stopping
@@ -177,7 +177,7 @@ ffn_sweep = {
             'value': True # do not change this value. Passed to train_ffn so it does not use wandb
         },
         "arrhenius": {
-            'value': True
+            'value': False
         },
         "regularisation": {
             'value':0
@@ -216,7 +216,7 @@ ffn_sweep = {
             'value': 128
         },
         'num_continuous_vars': {
-            'value': 2
+            'value': 3
         },
         'data_fraction': {
             'value': 1
@@ -225,10 +225,10 @@ ffn_sweep = {
             'value': 16
         },
         'accumulation_steps': {
-            'values': [4,8]
+            'values': [4,8,16]
         },
         'hidden_size': {
-            'value': 2048
+            'values': [512,1024,2048]
         },
         'num_hidden_layers': {
             'values':[1,2]
@@ -255,7 +255,7 @@ ffn_sweep = {
             'value': 1e-6
         },
         'output_size': {
-            'value': 2
+            'value': 1
         },
         'lr': {
             'values': [1e-4,5e-5,1e-5]
