@@ -33,7 +33,7 @@ preprocess_ffn = {
   "salt_encoding": "morgan", # {"morgan", "chemberta_tokenizer"}
   "salt_model_name": '', # {'seyonec/ChemBERTa-zinc-base-v1',''}
   "salt_col": "salt smiles",
-  "conts": ["mw","molality","temeperature_K"],
+  "conts": ["mw","molality","temperature_K"],
   "fpSize": 128,
   "verbose":False
 }
