@@ -114,7 +114,7 @@ ffn_cv = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_arr_90_10_new.pickle",
-  "output_name": "polybert_ffn_morgan_arr_90_10_new_unfrozen_seed42", # remember to not include .csv for this particular variable, used to name the model file also
+  "output_name": "polybert_ffn_morgan_arr_90_10_new_unfrozen_seed42_1024", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train","test"], # can be either "train", "test" or both
   "arrhenius": True,
   "regularisation": 0,
@@ -149,11 +149,11 @@ ffn_cv = {
   "encoder_init_lr" : 5e-6, # only passed to initialise_optimiser
   "salt_freeze_layers": 12,
   "salt_encoder_init_lr": 1e-6, # only passed to initialise_optimiser
-  "lr": 1e-4,
+  "lr": 1e-5,
   'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR", "CosineLR"}
   'warmup_steps': 10, # Usually 6% for LinearLR, 3% of total training steps for CosineLR.
-  "epochs": 30,
+  "epochs": 25,
   }
 
 ffn_sweep = {
