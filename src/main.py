@@ -9,6 +9,7 @@ from train_xgb.xgb_cv import xgb_cv
 from train_xgb.xgb_sweep import xgb_sweep
 from train_ffn.ffn_cv import ffn_cv
 from train_ffn.ffn_sweep import ffn_sweep
+from train_ffn.ffn_vis import ffn_vis
 from check.check import check
 
 import wandb
@@ -21,7 +22,8 @@ step_funcs = {"data_cleaning": data_cleaning,
               "xgb_sweep": xgb_sweep,
               "ffn_cv": ffn_cv,
               "ffn_sweep": ffn_sweep,
-              "check": check
+              "check": check,
+              "ffn_vis": ffn_vis
               }
 
 def main():

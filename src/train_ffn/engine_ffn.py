@@ -29,12 +29,17 @@ class Tester:
 
                 # Move tensors to device
                 text_input = text_input.to(self.device) 
+                if "attention_mask" in text_input:
+                    attention_mask = text_input["attention_mask"].squeeze(1)
+                    text_input = text_input["input_ids"].squeeze(1)
+                else:
+                    attention_mask = None    
                 salt_input = salt_input.to(self.device)
                 continuous_vars = continuous_vars.to(self.device)
                 labels = labels.to(self.device)
 
                 # Forward pass
-                outputs = self.model(text_input, salt_input, continuous_vars)
+                outputs = self.model(text_input, attention_mask, salt_input, continuous_vars)
                 if self.arrhenius:
                     outputs = arrhenius_score(outputs, temperatures)
 
@@ -74,12 +79,17 @@ class Engine:
 
             # Move tensors to device
             text_input = text_input.to(self.device) 
+            if "attention_mask" in text_input:
+                    attention_mask = text_input["attention_mask"].squeeze(1)
+                    text_input = text_input["input_ids"].squeeze(1)
+            else:
+                attention_mask = None    
             salt_input = salt_input.to(self.device)
             continuous_vars = continuous_vars.to(self.device)
             labels = labels.to(self.device)
 
             # Forward pass
-            outputs = self.model(text_input, salt_input, continuous_vars)
+            outputs = self.model(text_input, attention_mask, salt_input, continuous_vars)
             if self.arrhenius:
                 lnA,Ea = outputs[:,0],outputs[:,1]
                 outputs = arrhenius_score(outputs,temperatures)
@@ -114,12 +124,17 @@ class Engine:
 
                 # Move tensors to device
                 text_input = text_input.to(self.device) 
+                if "attention_mask" in text_input:
+                    attention_mask = text_input["attention_mask"].squeeze(1)
+                    text_input = text_input["input_ids"].squeeze(1)
+                else:
+                    attention_mask = None    
                 salt_input = salt_input.to(self.device)
                 continuous_vars = continuous_vars.to(self.device)
                 labels = labels.to(self.device)
 
                 # Forward pass
-                outputs = self.model(text_input, salt_input, continuous_vars)
+                outputs = self.model(text_input, attention_mask, salt_input, continuous_vars)
                 if self.arrhenius:
                     outputs = arrhenius_score(outputs,temperatures)
                 

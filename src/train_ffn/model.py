@@ -5,7 +5,7 @@ from transformers import AutoModel
 class FFNModel(nn.Module):
     def __init__(self, poly_model_name, salt_model_name, num_polymer_features,num_salt_features, num_continuous_vars, 
                  hidden_size = 2048, num_hidden_layers=2, dropout = 0.1, activation_fn="relu", init_method="glorot", 
-                 output_size = 1,freeze_layers=None, salt_freeze_layers = None):
+                 output_size = 1,freeze_layers=12, salt_freeze_layers = 12):
         super(FFNModel, self).__init__()
         if poly_model_name:
             self.polymerencoder = TransformerEncoder(model_name=poly_model_name, freeze_layers=freeze_layers)
@@ -52,11 +52,10 @@ class FFNModel(nn.Module):
         self.ffn = nn.Sequential(*ffn)
         # Initialize weights if an initialization method is provided
         initialize_weights(self.ffn, init_method=self.init_method)
-    
-    def forward(self, poly_input, salt_input, continuous_vars):
+     
+    def forward(self, poly_input, poly_attention_mask, salt_input, continuous_vars):
         if self.polymerencoder:
-            poly_input_ids, poly_attention_mask = poly_input["input_ids"].squeeze(1), poly_input["attention_mask"].squeeze(1)
-            polymer_embedding = self.polymerencoder(input_ids=poly_input_ids, attention_mask = poly_attention_mask)
+            polymer_embedding = self.polymerencoder(input_ids=poly_input, attention_mask = poly_attention_mask)
         else:
             polymer_embedding = poly_input
         
