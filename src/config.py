@@ -113,10 +113,10 @@ ffn_cv = {
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "polybert_ffn_morgan_90_10_new.pickle",
-  "output_name": "polybert_ffn_morgan_90_10_new_seed42", # remember to not include .csv for this particular variable, used to name the model file also
-  "modes": ["test"], # can be either "train", "test" or both
-  "arrhenius": False,
+  "input_data_name": "polybert_ffn_morgan_arr_90_10_new.pickle",
+  "output_name": "polybert_ffn_morgan_arr_90_10_new_unfrozen_seed42_1024", # remember to not include .csv for this particular variable, used to name the model file also
+  "modes": ["train","test"], # can be either "train", "test" or both
+  "arrhenius": True,
   "regularisation": 0,
 
   # defines model architecture
@@ -140,7 +140,7 @@ ffn_cv = {
   "batch_size": 16, # cannot exceed 32 atm due to memory limits
   "accumulation_steps": 8,
   "hidden_size": 2048,
-  "num_hidden_layers": 1,
+  "num_hidden_layers": 2,
   "dropout": 0.1,
   "activation_fn": "relu",
   "init_method": "glorot",
@@ -149,19 +149,19 @@ ffn_cv = {
   "encoder_init_lr" : 5e-6, # only passed to initialise_optimiser
   "salt_freeze_layers": 12,
   "salt_encoder_init_lr": 1e-6, # only passed to initialise_optimiser
-  "lr": 1e-4,
+  "lr": 1e-5,
   'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR", "CosineLR"}
   'warmup_steps': 10, # Usually 6% for LinearLR, 3% of total training steps for CosineLR.
-  "epochs": 30,
+  "epochs": 25,
   }
 
 ffn_sweep = {
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "polybert_ffn_morgan_80_20_new.pickle",
-  "output_name": "polybert_ffn_morgan_80_20_new_frozen",
+  "input_data_name": "polybert_ffn_morgan_arr_10fold_90_10.pickle",
+  "output_name": "polybert_ffn_morgan_arr_10fold_90_10_unfrozen_sweep_noscheduler",
   "fold": 0, # the fold index
   "rounds": 54,
   "seed": 42, 
@@ -225,10 +225,10 @@ ffn_sweep = {
             'value': 16
         },
         'accumulation_steps': {
-            'values': [4,8,16]
+            'values': [4,8]
         },
         'hidden_size': {
-            'values': [512,1024,2048]
+            'value': 2048
         },
         'num_hidden_layers': {
             'values':[1,2]
