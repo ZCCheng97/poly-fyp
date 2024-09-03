@@ -139,7 +139,7 @@ ffn_cv = {
   # tunable hyperparameters
   "batch_size": 16, # cannot exceed 32 atm due to memory limits
   "accumulation_steps": 8,
-  "hidden_size": 2048,
+  "hidden_size": 1024,
   "num_hidden_layers": 2,
   "dropout": 0.1,
   "activation_fn": "relu",
