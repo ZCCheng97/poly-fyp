@@ -34,7 +34,7 @@ def train_ffn(tabularsplit,args, trained_model_path, log_csv_path, save = True) 
                      salt_freeze_layers=args.salt_freeze_layers)
     model.to(args.device)
   
-    criterion = nn.L1Loss()
+    criterion = nn.MSELoss()
     optimizer = initialize_optimizer(args, model) # Fully connected layers (FFN)
     scheduler = initialize_scheduler(args,optimizer,num_training_steps=num_training_steps)
 
