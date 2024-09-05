@@ -114,7 +114,7 @@ ffn_cv = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_90_10_new.pickle",
-  "output_name": "polybert_ffn_morgan_90_10_new_seed42_MSE", # remember to not include .csv for this particular variable, used to name the model file also
+  "output_name": "polybert_ffn_morgan_90_10_new_seed42_BN", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train","test"], # can be either "train", "test" or both
   "arrhenius": False,
   "regularisation": 0,
@@ -141,6 +141,7 @@ ffn_cv = {
   "accumulation_steps": 8,
   "hidden_size": 2048,
   "num_hidden_layers": 1,
+  "batchnorm": True,
   "dropout": 0.1,
   "activation_fn": "relu",
   "init_method": "glorot",
@@ -233,6 +234,9 @@ ffn_sweep = {
         'num_hidden_layers': {
             'values':[1,2]
         },
+        "batchnorm": {
+            'value': False
+        },
         'dropout': {
             'value': .1
         },
@@ -282,7 +286,7 @@ ffn_vis = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_90_10_new.pickle",
-  "output_name": "polybert_ffn_morgan_90_10_new_seed42", # remember to not include .csv for this particular variable, used to name the model file also
+  "output_name": "polybert_ffn_morgan_90_10_new_seed42_DUMMYBN", # remember to not include .csv for this particular variable, used to name the model file also
   "device": "cuda",
   "fold":0, # fold idx: int
   "arrhenius": False,
@@ -302,11 +306,12 @@ ffn_vis = {
   "num_polymer_features": 600, # 600 for polybert, 128 for morgan
   "num_salt_features": 128, # 768 for chemberta, 128 for morgan
   "num_continuous_vars": 3, # change to 2 if using Arrhenius mode, otherwise 3 cont variables
-  "data_fraction": 1, # use something small like 0.01 if you want to do quick run for error checking
+  "data_fraction": .01, # use something small like 0.01 if you want to do quick run for error checking
 
   # tunable hyperparameters
   "hidden_size": 2048,
   "num_hidden_layers": 1,
+  "batchnorm": False,
   "activation_fn": "relu",
   "init_method": "glorot",
   "output_size": 1, # change to 2 if using Arrhenius mode, otherwise 1

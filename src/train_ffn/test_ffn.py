@@ -21,6 +21,7 @@ def test_ffn(tabularsplit, args, trained_model_path) -> float:
                      num_continuous_vars=args.num_continuous_vars,
                      hidden_size=args.hidden_size, 
                      num_hidden_layers=args.num_hidden_layers, 
+                     batchnorm=args.batchnorm,
                      dropout=args.dropout, 
                      activation_fn=args.activation_fn, 
                      init_method=args.init_method, 

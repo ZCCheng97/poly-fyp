@@ -26,6 +26,7 @@ def train_ffn(tabularsplit,args, trained_model_path, log_csv_path, save = True) 
                      num_continuous_vars=args.num_continuous_vars,
                      hidden_size=args.hidden_size, 
                      num_hidden_layers=args.num_hidden_layers, 
+                     batchnorm=args.batchnorm,
                      dropout=args.dropout, 
                      activation_fn=args.activation_fn, 
                      init_method=args.init_method, 
@@ -34,7 +35,7 @@ def train_ffn(tabularsplit,args, trained_model_path, log_csv_path, save = True) 
                      salt_freeze_layers=args.salt_freeze_layers)
     model.to(args.device)
   
-    criterion = nn.MSELoss()
+    criterion = nn.L1Loss()
     optimizer = initialize_optimizer(args, model) # Fully connected layers (FFN)
     scheduler = initialize_scheduler(args,optimizer,num_training_steps=num_training_steps)
 

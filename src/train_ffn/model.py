@@ -4,7 +4,7 @@ from transformers import AutoModel
 
 class FFNModel(nn.Module):
     def __init__(self, poly_model_name, salt_model_name, num_polymer_features,num_salt_features, num_continuous_vars, 
-                 hidden_size = 2048, num_hidden_layers=2, dropout = 0.1, activation_fn="relu", init_method="glorot", 
+                 hidden_size = 2048, num_hidden_layers=2, batchnorm = False, dropout = 0.1, activation_fn="relu", init_method="glorot", 
                  output_size = 1,freeze_layers=12, salt_freeze_layers = 12):
         super(FFNModel, self).__init__()
         if poly_model_name:
@@ -22,9 +22,9 @@ class FFNModel(nn.Module):
         self.activation_fn = pick_activation(activation_fn)
         self.init_method = init_method
 
-        self.create_ffn(self.input_dim, num_hidden_layers, hidden_size, self.activation_fn, dropout, output_size)
+        self.create_ffn(self.input_dim, num_hidden_layers, hidden_size, batchnorm, self.activation_fn, dropout, output_size)
 
-    def create_ffn(self, input_dim, num_hidden_layers, hidden_size, activation_fn, dropout, output_size):
+    def create_ffn(self, input_dim, num_hidden_layers, hidden_size, batchnorm, activation_fn, dropout, output_size):
         dropout = nn.Dropout(dropout)
         if num_hidden_layers == 0:
             ffn = [
@@ -37,11 +37,13 @@ class FFNModel(nn.Module):
                 nn.Linear(input_dim, hidden_size)
             ]
             for _ in range(num_hidden_layers-1):
+                if batchnorm: ffn.append(nn.BatchNorm1d(hidden_size))
                 ffn.extend([
                     activation_fn,
                     dropout,
                     nn.Linear(hidden_size, hidden_size),
                 ])
+            if batchnorm: ffn.append(nn.BatchNorm1d(hidden_size))
             ffn.extend([
                 activation_fn,
                 dropout,
