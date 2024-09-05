@@ -162,10 +162,10 @@ ffn_sweep = {
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "polybert_ffn_morgan_80_20_new.pickle",
-  "output_name": "polybert_ffn_morgan_80_20_new_unfrozen_sweep",
-  "fold": 2, # the fold index
-  "rounds": 36,
+  "input_data_name": "polybert_ffn_morgan_90_10_new.pickle",
+  "output_name": "polybert_ffn_morgan_90_10_new_unfrozen_clip_sweep",
+  "fold": 0, # the fold index
+  "rounds": 24,
   "seed": 42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
@@ -233,7 +233,7 @@ ffn_sweep = {
             'value': 2048
         },
         'num_hidden_layers': {
-            'values':[1,2]
+            'values':[2,3]
         },
         "batchnorm": {
             'value': False
@@ -263,7 +263,7 @@ ffn_sweep = {
             'value': 1
         },
         'lr': {
-            'values': [1e-4,5e-5,1e-5]
+            'values': [5e-5,1e-5]
         },
         'optimizer': {
             'value': "AdamW"
