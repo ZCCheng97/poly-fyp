@@ -108,15 +108,15 @@ xgb_sweep = {
 }
 
 ffn_cv = {
-  "use_wandb" : False,
+  "use_wandb" : True,
   "best_params": "", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>."
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "polybert_ffn_morgan_arr_90_10_new.pickle",
-  "output_name": "polybert_ffn_morgan_arr_90_10_new_unfrozen_seed42_1024", # remember to not include .csv for this particular variable, used to name the model file also
+  "input_data_name": "polybert_ffn_morgan_80_20_new.pickle",
+  "output_name": "polybert_ffn_morgan_80_20_new_seed42", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train","test"], # can be either "train", "test" or both
-  "arrhenius": True,
+  "arrhenius": False,
   "regularisation": 0,
 
   # defines model architecture
@@ -128,7 +128,7 @@ ffn_cv = {
   "poly_model_name": 'kuelumbus/polyBERT', # 'kuelumbus/polyBERT' if using polyBERT, blank if not using trained embeddings
   "conts": ["mw","molality","temperature_K"], # conts that are selected for modeling, include temp_K column even if using Arrhenius
   "temperature_name": "temperature_K",
-  "fold_list":[0], 
+  "fold_list":[0,1,2,3,4], 
   "seed": 42,
   "device": "cuda",
   "num_polymer_features": 600, # 600 for polybert, 128 for morgan
@@ -140,16 +140,16 @@ ffn_cv = {
   "batch_size": 16, # cannot exceed 32 atm due to memory limits
   "accumulation_steps": 8,
   "hidden_size": 2048,
-  "num_hidden_layers": 2,
+  "num_hidden_layers": 1,
   "dropout": 0.1,
   "activation_fn": "relu",
   "init_method": "glorot",
   "output_size": 1, # change to 2 if using Arrhenius mode, otherwise 1
-  "freeze_layers": 0, # by default 12 layers in polyBERT
+  "freeze_layers": 12, # by default 12 layers in polyBERT
   "encoder_init_lr" : 5e-6, # only passed to initialise_optimiser
   "salt_freeze_layers": 12,
   "salt_encoder_init_lr": 1e-6, # only passed to initialise_optimiser
-  "lr": 1e-5,
+  "lr": 5e-5,
   'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR", "CosineLR"}
   'warmup_steps': 10, # Usually 6% for LinearLR, 3% of total training steps for CosineLR.
@@ -163,7 +163,7 @@ ffn_sweep = {
   "input_data_name": "polybert_ffn_morgan_80_20_new.pickle",
   "output_name": "polybert_ffn_morgan_80_20_new_sweep",
   "fold": 2, # the fold index
-  "rounds": 54,
+  "rounds": 1,
   "seed": 42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
@@ -219,7 +219,7 @@ ffn_sweep = {
             'value': 3
         },
         'data_fraction': {
-            'value': 1
+            'value': .01
         },
         'batch_size': {
             'value': 16
@@ -270,7 +270,7 @@ ffn_sweep = {
             'value': 10
         },
         'epochs': {
-            'value': 25
+            'value': 2
         },
     }
 },
