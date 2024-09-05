@@ -161,9 +161,9 @@ ffn_sweep = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_80_20_new.pickle",
-  "output_name": "polybert_ffn_morgan_80_20_new_sweep",
+  "output_name": "polybert_ffn_morgan_80_20_new_unfrozen_sweep",
   "fold": 2, # the fold index
-  "rounds": 1,
+  "rounds": 36,
   "seed": 42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
@@ -225,10 +225,10 @@ ffn_sweep = {
             'value': 16
         },
         'accumulation_steps': {
-            'values': [4,8,16]
+            'values': [8,16]
         },
         'hidden_size': {
-            'values': [512,1024,2048]
+            'value': 2048
         },
         'num_hidden_layers': {
             'values':[1,2]
@@ -243,10 +243,10 @@ ffn_sweep = {
             'value': 'glorot'
         },
         'freeze_layers': {
-            'value': 12
+            'value': 0
         },
         'encoder_init_lr': {
-            'value': 1e-6
+            'values': [1e-6,5e-6,1e-5]
         },
         'salt_freeze_layers': {
             'value': 12
@@ -270,7 +270,7 @@ ffn_sweep = {
             'value': 10
         },
         'epochs': {
-            'value': 2
+            'value': 25
         },
     }
 },
