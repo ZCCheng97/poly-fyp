@@ -53,10 +53,11 @@ class Tester:
         return scores, all_labels, all_outputs
 
 class Engine:
-    def __init__(self, model, criterion, optimizer, device, accumulation_steps, arrhenius=False, regularisation = 0.0):
+    def __init__(self, model, criterion, optimizer, grad_clip, device, accumulation_steps, arrhenius=False, regularisation = 0.0):
         self.model = model
         self.criterion = criterion
         self.optimizer = optimizer
+        self.grad_clip = grad_clip
         self.device = device
         self.accumulation_steps = accumulation_steps
         self.arrhenius = arrhenius
@@ -105,6 +106,8 @@ class Engine:
             # Backward pass and optimization
             loss.backward()
             if ((i + 1) % self.accumulation_steps == 0) or (i == len(train_dataloader) - 1):
+                if self.grad_clip:
+                    torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip)
                 self.optimizer.step()  # Update the model's parameters
                 self.optimizer.zero_grad()
 

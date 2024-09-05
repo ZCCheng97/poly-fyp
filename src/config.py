@@ -114,7 +114,7 @@ ffn_cv = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_90_10_new.pickle",
-  "output_name": "polybert_ffn_morgan_90_10_new_seed42_BN", # remember to not include .csv for this particular variable, used to name the model file also
+  "output_name": "polybert_ffn_morgan_90_10_new_seed42_clip", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train","test"], # can be either "train", "test" or both
   "arrhenius": False,
   "regularisation": 0,
@@ -141,7 +141,7 @@ ffn_cv = {
   "accumulation_steps": 8,
   "hidden_size": 2048,
   "num_hidden_layers": 1,
-  "batchnorm": True,
+  "batchnorm": False, # Always keep False
   "dropout": 0.1,
   "activation_fn": "relu",
   "init_method": "glorot",
@@ -153,6 +153,7 @@ ffn_cv = {
   "lr": 5e-5,
   'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR", "CosineLR"}
+  "grad_clip": 1.0,
   'warmup_steps': 10, # Usually 6% for LinearLR, 3% of total training steps for CosineLR.
   "epochs": 25,
   }
@@ -269,6 +270,9 @@ ffn_sweep = {
         },
         'scheduler': {
             'value': "ReduceLROnPlateau"
+        },
+        'grad_clip': {
+            'value': 1.0
         },
         'warmup_steps': {
             'value': 10
