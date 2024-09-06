@@ -19,13 +19,13 @@ class TorchDataset:
   def process(self,args) -> List[dict]:
     if args.poly_encoding == "morgan":
       self.df = smiles_to_fingerprint(self.df, args.poly_col, args.fpSize, to_cols = False)
-    if args.poly_encoding == "polybert_tokenizer":
+    if args.poly_encoding == "tokenizer":
       tokeniser = AutoTokenizer.from_pretrained(args.poly_model_name)
       self.df = smiles_to_tokens(self.df, args.poly_col, tokeniser)
 
     if args.salt_encoding == "morgan":
       self.df = smiles_to_fingerprint(self.df, args.salt_col, args.fpSize, to_cols = False)
-    if args.salt_encoding == "chemberta_tokenzer":
+    if args.salt_encoding == "chemberta_tokenizer":
       chemberta_tokeniser = AutoTokenizer.from_pretrained(args.salt_model_name)
       self.df = smiles_to_tokens(self.df, args.salt_col, chemberta_tokeniser)
 

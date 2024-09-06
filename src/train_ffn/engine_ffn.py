@@ -3,8 +3,64 @@ from tqdm import tqdm
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 import numpy as np
 from scipy.stats import spearmanr
+from captum.attr import LayerIntegratedGradients, visualization
 
 from .utils import arrhenius_score
+
+class Visualiser:
+    def __init__(self, model, device, tokeniser,arrhenius=False):
+        self.model = model
+        self.device = device
+        self.arrhenius = arrhenius
+        self.tokeniser = tokeniser
+    
+    def __call__(self, test_dataloader):
+        self.model.eval()
+        vis_record = []
+        with torch.no_grad():
+            for batch in tqdm(test_dataloader, desc="Visualising", total= test_dataloader.batch_sampler.sampler_len):
+                text_input = batch['poly_inputs']
+                salt_input = batch['salt_inputs']
+                continuous_vars = batch['continuous_vars']
+                labels = batch['label_var']
+
+                # Move tensors to device
+                text_input = text_input.to(self.device) 
+                if "attention_mask" in text_input:
+                    attention_mask = text_input["attention_mask"].squeeze(1)
+                    text_input = text_input["input_ids"].squeeze(1)
+                else:
+                    attention_mask = None 
+                salt_input = salt_input.to(self.device)
+                continuous_vars = continuous_vars.to(self.device)
+                labels = labels.to(self.device)    
+                
+                lig = LayerIntegratedGradients(self.model, self.model.polymerencoder.model.embeddings)
+                # Compute attributions based on the use_pretrained_embeddings flag
+                attributions, delta = lig.attribute( # attributions.shape = [batch_size,512,600] for polyBERT
+                    inputs=text_input,  # This assumes use_pretrained_embeddings=True
+                    additional_forward_args=(attention_mask, salt_input, continuous_vars),
+                    return_convergence_delta=True
+                )
+                outputs = self.model(text_input, attention_mask, salt_input, continuous_vars)
+
+                # Sum the attributions over embedding dimensions
+                attributions_sum = attributions.sum(dim=-1).squeeze(0) # shape = [batch_size, 512]
+                tokens = self.tokeniser.convert_ids_to_tokens(text_input.squeeze(0).cpu())
+
+                # Filter out [PAD] tokens
+                filtered_tokens = [token for token in tokens if token != "[PAD]"]
+                filtered_attributions = [attributions_sum[i] for i in range(len(tokens)) if tokens[i] != "[PAD]"]
+
+                 # Create the visualization data record
+                vis_record.append(visualization.VisualizationDataRecord(
+                    filtered_attributions, 
+                    outputs.item(),
+                    0, labels.item(), None, sum(filtered_attributions), 
+                    filtered_tokens, 
+                    convergence_score=delta.cpu()
+                ))
+        return vis_record
 
 class Tester:
     def __init__(self, model, device,arrhenius=False):

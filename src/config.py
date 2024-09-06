@@ -23,11 +23,11 @@ preprocess_xgb = {
 preprocess_ffn = {
   "data_dir_name": "data",
   "input_data_name": "cleaned_data.xlsx",
-  "output_data_name": "polybert_ffn_morgan_80_20_new.pickle", # {poly_encoding}_{ffn/xgb}_{salt_encoding}_{arr/None}.pickle
-  "train_ratio":0.8,
-  "val_ratio":0.1,
-  "nfolds": 5,
-  "poly_encoding": "polybert_tokenizer", # {"polybert_tokenizer", "morgan"}
+  "output_data_name": "polybert_ffn_morgan_90_10_new.pickle", # {poly_encoding}_{ffn/xgb}_{salt_encoding}_{arr/None}.pickle
+  "train_ratio":0.9,
+  "val_ratio":0.05,
+  "nfolds": 10,
+  "poly_encoding": "tokenizer", # {"tokenizer", "morgan"}
   "poly_model_name": 'kuelumbus/polyBERT', # {'kuelumbus/polyBERT', ''}
   "poly_col": "psmiles",
   "salt_encoding": "morgan", # {"morgan", "chemberta_tokenizer"}
@@ -35,7 +35,7 @@ preprocess_ffn = {
   "salt_col": "salt smiles",
   "conts": ["mw","molality","temperature_K"],
   "fpSize": 128,
-  "verbose":False
+  "verbose":True
 }
 
 xgb_cv = {
@@ -114,7 +114,7 @@ ffn_cv = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_90_10_new.pickle",
-  "output_name": "polybert_ffn_morgan_90_10_new_seed42_clip", # remember to not include .csv for this particular variable, used to name the model file also
+  "output_name": "polybert_ffn_morgan_90_10_new_unfrozen_seed42_clip", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train","test"], # can be either "train", "test" or both
   "arrhenius": False,
   "regularisation": 0,
@@ -124,7 +124,7 @@ ffn_cv = {
   "salt_encoding": "morgan", # matches column name in df, use "chemberta_tokenizer" for encoding, "morgan" for fp, "" to omit using salt as a predictor
   "salt_model_name": '', # 'seyonec/ChemBERTa-zinc-base-v1' for Chemberta, blank if not using trained embeddings
   'poly_col': "psmiles",# matches column name in df
-  "poly_encoding": "polybert_tokenizer", # matches column name in df, use "polybert_tokenizer" for encoding, "morgan" for fp
+  "poly_encoding": "tokenizer", # matches column name in df, use "polybert_tokenizer" for encoding, "morgan" for fp
   "poly_model_name": 'kuelumbus/polyBERT', # 'kuelumbus/polyBERT' if using polyBERT, blank if not using trained embeddings
   "conts": ["mw","molality","temperature_K"], # conts that are selected for modeling, include temp_K column even if using Arrhenius
   "temperature_name": "temperature_K",
@@ -138,19 +138,19 @@ ffn_cv = {
 
   # tunable hyperparameters
   "batch_size": 16, # cannot exceed 32 atm due to memory limits
-  "accumulation_steps": 8,
+  "accumulation_steps": 16,
   "hidden_size": 2048,
-  "num_hidden_layers": 1,
+  "num_hidden_layers": 2,
   "batchnorm": False, # Always keep False
   "dropout": 0.1,
   "activation_fn": "relu",
   "init_method": "glorot",
   "output_size": 1, # change to 2 if using Arrhenius mode, otherwise 1
-  "freeze_layers": 12, # by default 12 layers in polyBERT
+  "freeze_layers": 0, # by default 12 layers in polyBERT
   "encoder_init_lr" : 5e-6, # only passed to initialise_optimiser
   "salt_freeze_layers": 12,
   "salt_encoder_init_lr": 1e-6, # only passed to initialise_optimiser
-  "lr": 5e-5,
+  "lr": 1e-5,
   'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR", "CosineLR"}
   "grad_clip": 1.0,
@@ -165,7 +165,7 @@ ffn_sweep = {
   "input_data_name": "polybert_ffn_morgan_90_10_new.pickle",
   "output_name": "polybert_ffn_morgan_90_10_new_unfrozen_clip_sweep",
   "fold": 0, # the fold index
-  "rounds": 24,
+  "rounds": 3,
   "seed": 42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
@@ -206,7 +206,7 @@ ffn_sweep = {
             'value': 'kuelumbus/polyBERT'
         },
         'poly_encoding': {
-            'value': 'polybert_tokenizer'
+            'value': 'tokenizer'
         },
         'poly_col': {
             'value': 'psmiles'
@@ -221,25 +221,25 @@ ffn_sweep = {
             'value': 3
         },
         'data_fraction': {
-            'value': .01
+            'value': 1
         },
         'batch_size': {
             'value': 16
         },
         'accumulation_steps': {
-            'values': [8,16]
+            'value': 16
         },
         'hidden_size': {
             'value': 2048
         },
         'num_hidden_layers': {
-            'values':[2,3]
+            'value': 2 
         },
         "batchnorm": {
             'value': False
         },
         'dropout': {
-            'value': .1
+            'values': [0,.05,.1]
         },
         'activation_fn': {
             'value': "relu"
@@ -251,7 +251,7 @@ ffn_sweep = {
             'value': 0
         },
         'encoder_init_lr': {
-            'values': [1e-6,5e-6,1e-5]
+            'values': 1e-5
         },
         'salt_freeze_layers': {
             'value': 12
@@ -263,7 +263,7 @@ ffn_sweep = {
             'value': 1
         },
         'lr': {
-            'values': [5e-5,1e-5]
+            'values': 1e-5
         },
         'optimizer': {
             'value': "AdamW"
@@ -290,19 +290,20 @@ ffn_vis = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_90_10_new.pickle",
-  "output_name": "polybert_ffn_morgan_90_10_new_seed42_DUMMYBN", # remember to not include .csv for this particular variable, used to name the model file also
+  "output_name": "polybert_ffn_morgan_90_10_new_seed42", # remember to not include .csv for this particular variable, used to name the model file also
   "device": "cuda",
   "fold":0, # fold idx: int
   "arrhenius": False,
   "regularisation": 0,
-  "sample_idx": 42,
+  "start_idx": 106,
+  "end_idx": 113,
 
   # defines model architecture
   "salt_col": "salt smiles", # matches column name in df
   "salt_encoding": "morgan", # matches column name in df, use "chemberta_tokenizer" for encoding, "morgan" for fp, "" to omit using salt as a predictor
   "salt_model_name": '', # 'seyonec/ChemBERTa-zinc-base-v1' for Chemberta, blank if not using trained embeddings
   'poly_col': "psmiles",# matches column name in df
-  "poly_encoding": "polybert_tokenizer", # matches column name in df, use "polybert_tokenizer" for encoding, "morgan" for fp
+  "poly_encoding": "tokenizer", # matches column name in df, use "tokenizer" for encoding, "morgan" for fp
   "poly_model_name": 'kuelumbus/polyBERT', # 'kuelumbus/polyBERT' if using polyBERT, blank if not using trained embeddings
   "conts": ["mw","molality","temperature_K"], # conts that are selected for modeling, include temp_K column even if using Arrhenius
   "temperature_name": "temperature_K",
@@ -310,7 +311,7 @@ ffn_vis = {
   "num_polymer_features": 600, # 600 for polybert, 128 for morgan
   "num_salt_features": 128, # 768 for chemberta, 128 for morgan
   "num_continuous_vars": 3, # change to 2 if using Arrhenius mode, otherwise 3 cont variables
-  "data_fraction": .01, # use something small like 0.01 if you want to do quick run for error checking
+  "data_fraction": 1, # use something small like 0.01 if you want to do quick run for error checking
 
   # tunable hyperparameters
   "hidden_size": 2048,
