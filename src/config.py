@@ -142,12 +142,12 @@ ffn_cv = {
   "hidden_size": 2048,
   "num_hidden_layers": 2,
   "batchnorm": False, # Always keep False
-  "dropout": 0.1,
+  "dropout": 0.05,
   "activation_fn": "relu",
   "init_method": "glorot",
   "output_size": 1, # change to 2 if using Arrhenius mode, otherwise 1
   "freeze_layers": 0, # by default 12 layers in polyBERT
-  "encoder_init_lr" : 5e-6, # only passed to initialise_optimiser
+  "encoder_init_lr" : 1e-5, # only passed to initialise_optimiser
   "salt_freeze_layers": 12,
   "salt_encoder_init_lr": 1e-6, # only passed to initialise_optimiser
   "lr": 1e-5,
@@ -251,7 +251,7 @@ ffn_sweep = {
             'value': 0
         },
         'encoder_init_lr': {
-            'values': 1e-5
+            'value': 1e-5
         },
         'salt_freeze_layers': {
             'value': 12
@@ -263,7 +263,7 @@ ffn_sweep = {
             'value': 1
         },
         'lr': {
-            'values': 1e-5
+            'value': 1e-5
         },
         'optimizer': {
             'value': "AdamW"

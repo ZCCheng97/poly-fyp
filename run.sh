@@ -1,3 +1,3 @@
 cd src
 
-python main.py ffn_vis
+python main.py preprocess_ffn ffn_sweep
