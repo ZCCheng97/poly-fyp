@@ -108,13 +108,13 @@ xgb_sweep = {
 }
 
 ffn_cv = {
-  "use_wandb" : True,
+  "use_wandb" : False,
   "best_params": "", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>."
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_90_10_new.pickle",
-  "output_name": "polybert_ffn_morgan_90_10_new_unfrozen_seed42_clip", # remember to not include .csv for this particular variable, used to name the model file also
+  "output_name": "DUMMY", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train","test"], # can be either "train", "test" or both
   "arrhenius": False,
   "regularisation": 0,
@@ -128,31 +128,32 @@ ffn_cv = {
   "poly_model_name": 'kuelumbus/polyBERT', # 'kuelumbus/polyBERT' if using polyBERT, blank if not using trained embeddings
   "conts": ["mw","molality","temperature_K"], # conts that are selected for modeling, include temp_K column even if using Arrhenius
   "temperature_name": "temperature_K",
-  "fold_list":[0,1,2,3,4,5,6,7,8,9], 
+  "fold_list":[0], 
   "seed": 42,
   "device": "cuda",
   "num_polymer_features": 600, # 600 for polybert, 128 for morgan
   "num_salt_features": 128, # 768 for chemberta, 128 for morgan
   "num_continuous_vars": 3, # change to 2 if using Arrhenius mode, otherwise 3 cont variables
-  "data_fraction": 1, # use something small like 0.01 if you want to do quick run for error checking
+  "data_fraction": .01, # use something small like 0.01 if you want to do quick run for error checking
 
   # tunable hyperparameters
   "batch_size": 16, # cannot exceed 32 atm due to memory limits
-  "accumulation_steps": 16,
+  "accumulation_steps": 1,
   "hidden_size": 2048,
-  "num_hidden_layers": 2,
+  "num_hidden_layers": 1,
   "batchnorm": False, # Always keep False
   "dropout": 0.05,
   "activation_fn": "relu",
   "init_method": "glorot",
   "output_size": 1, # change to 2 if using Arrhenius mode, otherwise 1
-  "freeze_layers": 0, # by default 12 layers in polyBERT
+  "freeze_layers": 12, # by default 12 layers in polyBERT
   "encoder_init_lr" : 1e-5, # only passed to initialise_optimiser
   "salt_freeze_layers": 12,
   "salt_encoder_init_lr": 1e-6, # only passed to initialise_optimiser
   "lr": 1e-5,
   'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR", "CosineLR"}
+  "unfreezing_steps": 0, # leave as 0 if not using gradual unfreezing
   "grad_clip": 1.0,
   'warmup_steps': 10, # Usually 6% for LinearLR, 3% of total training steps for CosineLR.
   "epochs": 25,
@@ -163,9 +164,9 @@ ffn_sweep = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_90_10_new.pickle",
-  "output_name": "polybert_ffn_morgan_90_10_new_unfrozen_clip_sweep",
+  "output_name": "polybert_ffn_morgan_90_10_new_gradunfreeze_sweep",
   "fold": 0, # the fold index
-  "rounds": 3,
+  "rounds": 32,
   "seed": 42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
@@ -227,19 +228,19 @@ ffn_sweep = {
             'value': 16
         },
         'accumulation_steps': {
-            'value': 16
+            'values': [8,16]
         },
         'hidden_size': {
-            'value': 2048
+            'values': [1024, 2048]
         },
         'num_hidden_layers': {
-            'value': 2 
+            'values': [1,2]
         },
         "batchnorm": {
             'value': False
         },
         'dropout': {
-            'values': [0,.05,.1]
+            'value': .1
         },
         'activation_fn': {
             'value': "relu"
@@ -248,10 +249,10 @@ ffn_sweep = {
             'value': 'glorot'
         },
         'freeze_layers': {
-            'value': 0
+            'value': 12
         },
         'encoder_init_lr': {
-            'value': 1e-5
+            'values': [1e-6,5e-6]
         },
         'salt_freeze_layers': {
             'value': 12
@@ -263,13 +264,16 @@ ffn_sweep = {
             'value': 1
         },
         'lr': {
-            'value': 1e-5
+            'values': [5e-5,1e-5]
         },
         'optimizer': {
             'value': "AdamW"
         },
         'scheduler': {
             'value': "ReduceLROnPlateau"
+        },
+        'unfreezing_steps': {
+            'value': 5
         },
         'grad_clip': {
             'value': 1.0

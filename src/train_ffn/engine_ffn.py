@@ -118,6 +118,31 @@ class Engine:
         self.accumulation_steps = accumulation_steps
         self.arrhenius = arrhenius
         self.regularisation = regularisation
+    
+    def gradual_unfreeze(self, curr_epoch_idx, freq):
+        # Check epoch ranges to determine how many layers to unfreeze
+        unfreeze_embeds = False
+        if curr_epoch_idx < freq:
+            # Epochs 0 to freq-1: Freeze all layers
+            layers_to_unfreeze = set()
+        elif curr_epoch_idx < 2 * freq:
+            # Epochs freq to 2*freq-1: Unfreeze last 4 layers (indices 8 to 11)
+            layers_to_unfreeze = range(8, 12)
+        elif curr_epoch_idx < 3 * freq:
+            # Epochs 2*freq to 3*freq-1: Unfreeze last 8 layers (indices 4 to 11)
+            layers_to_unfreeze = range(4, 12)
+        else:
+            # Epochs 3*freq and beyond: Unfreeze all layers (indices 0 to 11)
+            layers_to_unfreeze = range(0, 12)
+            unfreeze_embeds = True
+
+        for name, param in self.model.named_parameters():
+            if "embeddings" in name and unfreeze_embeds:
+                param.requires_grad = True
+            if "layer" in name:
+                layer_idx = int(name.split('.')[4])  #named as polymerencoder.model.encoder.layer.0... etc."
+                if layer_idx in layers_to_unfreeze:
+                    param.requires_grad = True
 
     def __call__(self, train_dataloader, val_dataloader):
         train_loss, val_loss = 0.0,0.0

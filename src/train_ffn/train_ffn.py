@@ -54,6 +54,8 @@ def train_ffn(tabularsplit,args, trained_model_path, log_csv_path, save = True) 
     engine = Engine(model, criterion, optimizer, args.grad_clip, args.device, args.accumulation_steps, args.arrhenius,args.regularisation)
 
     for epoch in tqdm(range(args.epochs-elapsed_epochs), desc="Epoch", total=args.epochs-elapsed_epochs):
+        if args.unfreezing_steps: engine.gradual_unfreeze(epoch, args.unfreezing_steps)
+
         train_loss, val_loss = engine(train_loader, val_loader)
         if val_loss < current_best_loss:
             current_best_loss = val_loss
