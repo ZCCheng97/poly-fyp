@@ -4,6 +4,7 @@ from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 import numpy as np
 from scipy.stats import spearmanr
 from captum.attr import LayerIntegratedGradients, visualization
+import transformers
 
 from .utils import arrhenius_score
 
@@ -26,7 +27,7 @@ class Visualiser:
 
                 # Move tensors to device
                 text_input = text_input.to(self.device) 
-                if "attention_mask" in text_input:
+                if isinstance(text_input,(dict, transformers.tokenization_utils_base.BatchEncoding)) and "attention_mask" in text_input:
                     attention_mask = text_input["attention_mask"].squeeze(1)
                     text_input = text_input["input_ids"].squeeze(1)
                 else:
@@ -85,7 +86,7 @@ class Tester:
 
                 # Move tensors to device
                 text_input = text_input.to(self.device) 
-                if "attention_mask" in text_input:
+                if isinstance(text_input,(dict, transformers.tokenization_utils_base.BatchEncoding)) and "attention_mask" in text_input:
                     attention_mask = text_input["attention_mask"].squeeze(1)
                     text_input = text_input["input_ids"].squeeze(1)
                 else:
@@ -161,7 +162,7 @@ class Engine:
 
             # Move tensors to device
             text_input = text_input.to(self.device) 
-            if "attention_mask" in text_input:
+            if isinstance(text_input,(dict, transformers.tokenization_utils_base.BatchEncoding)) and "attention_mask" in text_input:
                     attention_mask = text_input["attention_mask"].squeeze(1)
                     text_input = text_input["input_ids"].squeeze(1)
             else:
@@ -169,7 +170,7 @@ class Engine:
             salt_input = salt_input.to(self.device)
             continuous_vars = continuous_vars.to(self.device)
             labels = labels.to(self.device)
-
+            print(type(text_input))
             # Forward pass
             outputs = self.model(text_input, attention_mask, salt_input, continuous_vars)
             if self.arrhenius:
@@ -208,7 +209,7 @@ class Engine:
 
                 # Move tensors to device
                 text_input = text_input.to(self.device) 
-                if "attention_mask" in text_input:
+                if isinstance(text_input,(dict, transformers.tokenization_utils_base.BatchEncoding)) and "attention_mask" in text_input:
                     attention_mask = text_input["attention_mask"].squeeze(1)
                     text_input = text_input["input_ids"].squeeze(1)
                 else:

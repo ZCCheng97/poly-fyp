@@ -23,13 +23,13 @@ preprocess_xgb = {
 preprocess_ffn = {
   "data_dir_name": "data",
   "input_data_name": "cleaned_data.xlsx",
-  "output_data_name": "polybert_ffn_morgan_90_10_new.pickle", # {poly_encoding}_{ffn/xgb}_{salt_encoding}_{arr/None}.pickle
+  "output_data_name": "chemberta_ffn_morgan_90_10_new.pickle", # {poly_encoding}_{ffn/xgb}_{salt_encoding}_{arr/None}.pickle
   "train_ratio":0.9,
   "val_ratio":0.05,
   "nfolds": 10,
   "poly_encoding": "tokenizer", # {"tokenizer", "morgan"}
-  "poly_model_name": 'kuelumbus/polyBERT', # {'kuelumbus/polyBERT', ''}
-  "poly_col": "psmiles",
+  "poly_model_name": 'seyonec/ChemBERTa-zinc-base-v1', # {'kuelumbus/polyBERT', ''}
+  "poly_col": "long_smiles",
   "salt_encoding": "morgan", # {"morgan", "chemberta_tokenizer"}
   "salt_model_name": '', # {'seyonec/ChemBERTa-zinc-base-v1',''}
   "salt_col": "salt smiles",
@@ -108,13 +108,13 @@ xgb_sweep = {
 }
 
 ffn_cv = {
-  "use_wandb" : True,
+  "use_wandb" : False,
   "best_params": "", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>."
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "polybert_ffn_morgan_90_10_new.pickle",
-  "output_name": "polybert_ffn_morgan_90_10_new_gradunfreeze", # remember to not include .csv for this particular variable, used to name the model file also
+  "input_data_name": "chemberta_ffn_morgan_90_10_new.pickle",
+  "output_name": "DMMYCHEM", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train","test"], # can be either "train", "test" or both
   "arrhenius": False,
   "regularisation": 0,
@@ -123,24 +123,24 @@ ffn_cv = {
   "salt_col": "salt smiles", # matches column name in df
   "salt_encoding": "morgan", # matches column name in df, use "chemberta_tokenizer" for encoding, "morgan" for fp, "" to omit using salt as a predictor
   "salt_model_name": '', # 'seyonec/ChemBERTa-zinc-base-v1' for Chemberta, blank if not using trained embeddings
-  'poly_col': "psmiles",# matches column name in df
-  "poly_encoding": "tokenizer", # matches column name in df, use "polybert_tokenizer" for encoding, "morgan" for fp
-  "poly_model_name": 'kuelumbus/polyBERT', # 'kuelumbus/polyBERT' if using polyBERT, blank if not using trained embeddings
+  'poly_col': "long_smiles",# matches column name in df
+  "poly_encoding": "tokenizer", # matches column name in df, use "tokenizer" for encoding, "morgan" for fp
+  "poly_model_name": 'seyonec/ChemBERTa-zinc-base-v1', # 'kuelumbus/polyBERT' if using polyBERT, blank if not using trained embeddings
   "conts": ["mw","molality","temperature_K"], # conts that are selected for modeling, include temp_K column even if using Arrhenius
   "temperature_name": "temperature_K",
-  "fold_list":[0,1,2,3,4,5,6,7,8,9], 
+  "fold_list":[0], 
   "seed": 42,
   "device": "cuda",
-  "num_polymer_features": 600, # 600 for polybert, 128 for morgan
+  "num_polymer_features": 768, # 600 for polybert, 128 for morgan
   "num_salt_features": 128, # 768 for chemberta, 128 for morgan
   "num_continuous_vars": 3, # change to 2 if using Arrhenius mode, otherwise 3 cont variables
-  "data_fraction": 1, # use something small like 0.01 if you want to do quick run for error checking
+  "data_fraction": .01, # use something small like 0.01 if you want to do quick run for error checking
 
   # tunable hyperparameters
   "batch_size": 16, # cannot exceed 32 atm due to memory limits
-  "accumulation_steps": 8,
-  "hidden_size": 1024,
-  "num_hidden_layers": 2,
+  "accumulation_steps": 2,
+  "hidden_size": 512,
+  "num_hidden_layers": 1,
   "batchnorm": False, # Always keep False
   "dropout": 0.1,
   "activation_fn": "relu",
@@ -153,18 +153,18 @@ ffn_cv = {
   "lr": 1e-5,
   'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR", "CosineLR"}
-  "unfreezing_steps": 5, # leave as 0 if not using gradual unfreezing
+  "unfreezing_steps": 3, # leave as 0 if not using gradual unfreezing
   "grad_clip": 1.0,
   'warmup_steps': 10, # Usually 6% for LinearLR, 3% of total training steps for CosineLR.
-  "epochs": 25,
+  "epochs": 10,
   }
 
 ffn_sweep = {
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "polybert_ffn_morgan_90_10_new.pickle",
-  "output_name": "polybert_ffn_morgan_90_10_new_gradunfreeze_sweep",
+  "input_data_name": "chemberta_ffn_morgan_90_10_new.pickle",
+  "output_name": "chemberta_ffn_morgan_90_10_new_sweep",
   "fold": 0, # the fold index
   "rounds": 32,
   "seed": 42, 
@@ -204,16 +204,16 @@ ffn_sweep = {
             'value': 'cuda'
         },
         'poly_model_name': {
-            'value': 'kuelumbus/polyBERT'
+            'value': 'seyonec/ChemBERTa-zinc-base-v1'
         },
         'poly_encoding': {
             'value': 'tokenizer'
         },
         'poly_col': {
-            'value': 'psmiles'
+            'value': 'long_smiles'
         },
         'num_polymer_features': {
-            'value': 600
+            'value': 768
         },
         'num_salt_features': {
             'value': 128
@@ -228,13 +228,13 @@ ffn_sweep = {
             'value': 16
         },
         'accumulation_steps': {
-            'values': [8,16]
+            'values': [8,4]
         },
         'hidden_size': {
-            'values': [1024, 2048]
+            'values': [2048,1024]
         },
         'num_hidden_layers': {
-            'values': [1,2]
+            'values': [2,1]
         },
         "batchnorm": {
             'value': False
@@ -252,7 +252,7 @@ ffn_sweep = {
             'value': 12
         },
         'encoder_init_lr': {
-            'values': [1e-6,5e-6]
+            'values': [1e-5,1e-6]
         },
         'salt_freeze_layers': {
             'value': 12
@@ -264,7 +264,7 @@ ffn_sweep = {
             'value': 1
         },
         'lr': {
-            'values': [5e-5,1e-5]
+            'values': [1e-5,1e-4]
         },
         'optimizer': {
             'value': "AdamW"
