@@ -114,7 +114,7 @@ ffn_cv = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "chemberta77M_ffn_morgan_90_10_new.pickle",
-  "output_name": "chemberta77M_ffn_morgan_90_10_new_frozen", # remember to not include .csv for this particular variable, used to name the model file also
+  "output_name": "chemberta77M_ffn_morgan_90_10_new_gradunfreeze", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train","test"], # can be either "train", "test" or both
   "arrhenius": False,
   "regularisation": 0,
@@ -153,7 +153,7 @@ ffn_cv = {
   "lr": 1e-5,
   'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR", "CosineLR"}
-  "unfreezing_steps": 0, # leave as 0 if not using gradual unfreezing
+  "unfreezing_steps": 1, # leave as 0 if not using gradual unfreezing
   "grad_clip": 1.0,
   'warmup_steps': 10, # Usually 6% for LinearLR, 3% of total training steps for CosineLR.
   "epochs": 20,
