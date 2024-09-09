@@ -170,7 +170,7 @@ class Engine:
             salt_input = salt_input.to(self.device)
             continuous_vars = continuous_vars.to(self.device)
             labels = labels.to(self.device)
-            print(type(text_input))
+            
             # Forward pass
             outputs = self.model(text_input, attention_mask, salt_input, continuous_vars)
             if self.arrhenius:

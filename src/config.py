@@ -23,12 +23,12 @@ preprocess_xgb = {
 preprocess_ffn = {
   "data_dir_name": "data",
   "input_data_name": "cleaned_data.xlsx",
-  "output_data_name": "chemberta_ffn_morgan_90_10_new.pickle", # {poly_encoding}_{ffn/xgb}_{salt_encoding}_{arr/None}.pickle
+  "output_data_name": "chemberta77M_ffn_morgan_90_10_new.pickle", # {poly_encoding}_{ffn/xgb}_{salt_encoding}_{arr/None}.pickle
   "train_ratio":0.9,
   "val_ratio":0.05,
   "nfolds": 10,
   "poly_encoding": "tokenizer", # {"tokenizer", "morgan"}
-  "poly_model_name": 'seyonec/ChemBERTa-zinc-base-v1', # {'kuelumbus/polyBERT', ''}
+  "poly_model_name": 'DeepChem/ChemBERTa-77M-MLM', # {'kuelumbus/polyBERT', '', 'DeepChem/ChemBERTa-77M-MLM'}
   "poly_col": "long_smiles",
   "salt_encoding": "morgan", # {"morgan", "chemberta_tokenizer"}
   "salt_model_name": '', # {'seyonec/ChemBERTa-zinc-base-v1',''}
@@ -108,13 +108,13 @@ xgb_sweep = {
 }
 
 ffn_cv = {
-  "use_wandb" : False,
+  "use_wandb" : True,
   "best_params": "", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>."
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "chemberta_ffn_morgan_90_10_new.pickle",
-  "output_name": "chemberta_ffn_morgan_90_10_new_frozen", # remember to not include .csv for this particular variable, used to name the model file also
+  "input_data_name": "chemberta77M_ffn_morgan_90_10_new.pickle",
+  "output_name": "chemberta77M_ffn_morgan_90_10_new_frozen", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train","test"], # can be either "train", "test" or both
   "arrhenius": False,
   "regularisation": 0,
@@ -125,13 +125,13 @@ ffn_cv = {
   "salt_model_name": '', # 'seyonec/ChemBERTa-zinc-base-v1' for Chemberta, blank if not using trained embeddings
   'poly_col': "long_smiles",# matches column name in df
   "poly_encoding": "tokenizer", # matches column name in df, use "tokenizer" for encoding, "morgan" for fp
-  "poly_model_name": 'seyonec/ChemBERTa-zinc-base-v1', # 'kuelumbus/polyBERT' if using polyBERT, blank if not using trained embeddings
+  "poly_model_name": 'DeepChem/ChemBERTa-77M-MLM', # 'kuelumbus/polyBERT' if using polyBERT, blank if not using trained embeddings
   "conts": ["mw","molality","temperature_K"], # conts that are selected for modeling, include temp_K column even if using Arrhenius
   "temperature_name": "temperature_K",
   "fold_list":[0,1,2,3,4,5,6,7,8,9], 
   "seed": 42,
   "device": "cuda",
-  "num_polymer_features": 768, # 600 for polybert, 128 for morgan
+  "num_polymer_features": 384, # 600 for polybert, 128 for morgan
   "num_salt_features": 128, # 768 for chemberta, 128 for morgan
   "num_continuous_vars": 3, # change to 2 if using Arrhenius mode, otherwise 3 cont variables
   "data_fraction": 1, # use something small like 0.01 if you want to do quick run for error checking
@@ -156,14 +156,14 @@ ffn_cv = {
   "unfreezing_steps": 0, # leave as 0 if not using gradual unfreezing
   "grad_clip": 1.0,
   'warmup_steps': 10, # Usually 6% for LinearLR, 3% of total training steps for CosineLR.
-  "epochs": 25,
+  "epochs": 20,
   }
 
 ffn_sweep = {
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "chemberta_ffn_morgan_90_10_new.pickle",
+  "input_data_name": "chemberta77M_ffn_morgan_90_10_new.pickle",
   "output_name": "chemberta_ffn_morgan_90_10_new_sweep",
   "fold": 0, # the fold index
   "rounds": 32,
