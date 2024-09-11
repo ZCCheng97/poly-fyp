@@ -164,9 +164,9 @@ ffn_sweep = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_90_10_arr_new.pickle",
-  "output_name": "polybert_ffn_morgan_90_10_arr_new_sweep",
+  "output_name": "polybert_ffn_morgan_90_10_arr_new_scheduler_sweep",
   "fold": 0, # the fold index
-  "rounds": 36,
+  "rounds": 12,
   "seed": 42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
@@ -183,7 +183,7 @@ ffn_sweep = {
             'value': True
         },
         "regularisation": {
-            'value':0
+            'values':[0,.1e-4,1e-3]
         },
         "salt_col": {
             "value": "salt smiles"
@@ -228,13 +228,13 @@ ffn_sweep = {
             'value': 16
         },
         'accumulation_steps': {
-            'values': [8,4]
+            'value': 8
         },
         'hidden_size': {
-            'values': [2048,1024,512]
+            'values': [2048,1024]
         },
         'num_hidden_layers': {
-            'values': [2,3,1]
+            'values': [2,3]
         },
         "batchnorm": {
             'value': False
@@ -252,7 +252,7 @@ ffn_sweep = {
             'value': 12
         },
         'encoder_init_lr': {
-            'value': 1e-6
+            'value': 1e-5
         },
         'salt_freeze_layers': {
             'value': 12
@@ -264,13 +264,13 @@ ffn_sweep = {
             'value': 2
         },
         'lr': {
-            'values': [1e-5,1e-4]
+            'values': 1e-4
         },
         'optimizer': {
             'value': "AdamW"
         },
         'scheduler': {
-            'value': "ReduceLROnPlateau"
+            'value': "CosineLR"
         },
         'unfreezing_steps': {
             'value': 0
@@ -279,7 +279,7 @@ ffn_sweep = {
             'value': 1.0
         },
         'warmup_steps': {
-            'value': 10
+            'values': [10,20,50]
         },
         'epochs': {
             'value': 25
