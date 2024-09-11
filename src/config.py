@@ -183,7 +183,7 @@ ffn_sweep = {
             'value': True
         },
         "regularisation": {
-            'values':[0,.1e-4,1e-3]
+            'values':[0,1e-5,1e-4]
         },
         "salt_col": {
             "value": "salt smiles"
@@ -222,7 +222,7 @@ ffn_sweep = {
             'value': 3
         },
         'data_fraction': {
-            'value': .01
+            'value': 1
         },
         'batch_size': {
             'value': 16
@@ -231,7 +231,7 @@ ffn_sweep = {
             'value': 8
         },
         'hidden_size': {
-            'values': [2048,1024]
+            'value': 2048
         },
         'num_hidden_layers': {
             'values': [2,3]
@@ -279,10 +279,10 @@ ffn_sweep = {
             'value': 1.0
         },
         'warmup_steps': {
-            'values': [10,20,50]
+            'values': [10,20]
         },
         'epochs': {
-            'value': 2
+            'value': 40
         },
     }
 },
