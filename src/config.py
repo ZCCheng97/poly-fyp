@@ -222,7 +222,7 @@ ffn_sweep = {
             'value': 3
         },
         'data_fraction': {
-            'value': 1
+            'value': .01
         },
         'batch_size': {
             'value': 16
@@ -264,7 +264,7 @@ ffn_sweep = {
             'value': 2
         },
         'lr': {
-            'values': 1e-4
+            'value': 1e-4
         },
         'optimizer': {
             'value': "AdamW"
@@ -282,7 +282,7 @@ ffn_sweep = {
             'values': [10,20,50]
         },
         'epochs': {
-            'value': 25
+            'value': 2
         },
     }
 },
