@@ -114,7 +114,7 @@ ffn_cv = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_90_10_arr_new.pickle",
-  "output_name": "polybert_ffn_morgan_90_10_arr_new_frozen", # remember to not include .csv for this particular variable, used to name the model file also
+  "output_name": "polybert_ffn_morgan_90_10_arr_new_frozen_1e5reg", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train","test"], # can be either "train", "test" or both
   "arrhenius": True,
   "regularisation": 0,
@@ -156,7 +156,7 @@ ffn_cv = {
   "unfreezing_steps": 0, # leave as 0 if not using gradual unfreezing
   "grad_clip": 1.0,
   'warmup_steps': 10, # Usually 6% for LinearLR, 3% of total training steps for CosineLR.
-  "epochs": 20,
+  "epochs": 40,
   }
 
 ffn_sweep = {
@@ -164,9 +164,9 @@ ffn_sweep = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_90_10_arr_new.pickle",
-  "output_name": "polybert_ffn_morgan_90_10_arr_new_scheduler_sweep",
+  "output_name": "polybert_ffn_morgan_90_10_arr_new_scheduler_sweep_unfrozen",
   "fold": 0, # the fold index
-  "rounds": 12,
+  "rounds": 24,
   "seed": 42, 
   'sweep_id': '', # to resume a sweep after stopping
   "sweep_config":{
@@ -183,7 +183,7 @@ ffn_sweep = {
             'value': True
         },
         "regularisation": {
-            'values':[0,1e-5,1e-4]
+            'values':[0,1e-5]
         },
         "salt_col": {
             "value": "salt smiles"
@@ -252,7 +252,7 @@ ffn_sweep = {
             'value': 12
         },
         'encoder_init_lr': {
-            'value': 1e-5
+            'values': [1e-6,1e-5,1e-4]
         },
         'salt_freeze_layers': {
             'value': 12
@@ -270,19 +270,19 @@ ffn_sweep = {
             'value': "AdamW"
         },
         'scheduler': {
-            'value': "CosineLR"
+            'values': ["ReduceLROnPlateau","CosineLR"]
         },
         'unfreezing_steps': {
-            'value': 0
+            'value': 5
         },
         'grad_clip': {
             'value': 1.0
         },
         'warmup_steps': {
-            'values': [10,20]
+            'value': 10
         },
         'epochs': {
-            'value': 40
+            'value': 25
         },
     }
 },
