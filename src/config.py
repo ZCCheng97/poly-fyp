@@ -114,7 +114,7 @@ ffn_cv = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_90_10_arr_new.pickle",
-  "output_name": "polybert_ffn_morgan_90_10_arr_new_gradunfreeze", # remember to not include .csv for this particular variable, used to name the model file also
+  "output_name": "polybert_ffn_morgan_90_10_arr_new_seed3_gradunfreeze", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train","test"], # can be either "train", "test" or both
   "arrhenius": True,
   "regularisation": 0,
@@ -129,7 +129,7 @@ ffn_cv = {
   "conts": ["mw","molality","temperature_K"], # conts that are selected for modeling, include temp_K column even if using Arrhenius
   "temperature_name": "temperature_K",
   "fold_list":[0,1,2,3,4,5,6,7,8,9], 
-  "seed": 42,
+  "seed": 3,
   "device": "cuda",
   "num_polymer_features": 600, # 600 for polybert, 128 for morgan
   "num_salt_features": 128, # 768 for chemberta, 128 for morgan
