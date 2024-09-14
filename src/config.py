@@ -114,7 +114,7 @@ ffn_cv = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_90_10_arr_new.pickle",
-  "output_name": "polybert_ffn_morgan_90_10_arr_new_frozen", # remember to not include .csv for this particular variable, used to name the model file also
+  "output_name": "polybert_ffn_morgan_90_10_arr_new_gradunfreeze", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train","test"], # can be either "train", "test" or both
   "arrhenius": True,
   "regularisation": 0,
@@ -133,7 +133,7 @@ ffn_cv = {
   "device": "cuda",
   "num_polymer_features": 600, # 600 for polybert, 128 for morgan
   "num_salt_features": 128, # 768 for chemberta, 128 for morgan
-  "num_continuous_vars": 3, # change to 2 if using Arrhenius mode, otherwise 3 cont variables
+  "num_continuous_vars": 2, # change to 2 if using Arrhenius mode, otherwise 3 cont variables
   "data_fraction": 1, # use something small like 0.01 if you want to do quick run for error checking
 
   # tunable hyperparameters
@@ -147,16 +147,16 @@ ffn_cv = {
   "init_method": "glorot",
   "output_size": 2, # change to 2 if using Arrhenius mode, otherwise 1
   "freeze_layers": 12, # by default 12 layers in polyBERT
-  "encoder_init_lr" : 1e-5, # only passed to initialise_optimiser
+  "encoder_init_lr" : 1e-4, # only passed to initialise_optimiser
   "salt_freeze_layers": 12,
   "salt_encoder_init_lr": 1e-6, # only passed to initialise_optimiser
   "lr": 1e-4,
   'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR", "CosineLR"}
-  "unfreezing_steps": 0, # leave as 0 if not using gradual unfreezing
+  "unfreezing_steps": 5, # leave as 0 if not using gradual unfreezing
   "grad_clip": 1.0,
   'warmup_steps': 10, # Usually 6% for LinearLR, 3% of total training steps for CosineLR.
-  "epochs": 20,
+  "epochs": 30,
   }
 
 ffn_sweep = {
