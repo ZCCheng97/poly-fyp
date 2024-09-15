@@ -129,7 +129,7 @@ ffn_cv = {
   "conts": ["mw","molality","temperature_K"], # conts that are selected for modeling, include temp_K column even if using Arrhenius
   "temperature_name": "temperature_K",
   "fold_list":[0,1,2,3,4,5,6,7,8,9], 
-  "seed": 3,
+  "seed": 43,
   "device": "cuda",
   "num_polymer_features": 600, # 600 for polybert, 128 for morgan
   "num_salt_features": 128, # 768 for chemberta, 128 for morgan
