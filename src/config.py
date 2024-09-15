@@ -114,10 +114,10 @@ ffn_cv = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_90_10_arr_new.pickle",
-  "output_name": "polybert_ffn_morgan_90_10_arr_new_gradunfreeze_reg", # remember to not include .csv for this particular variable, used to name the model file also
+  "output_name": "polybert_ffn_morgan_90_10_arr_new_gradunfreeze_seed3", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train","test"], # can be either "train", "test" or both
   "arrhenius": True,
-  "regularisation": 1e-5,
+  "regularisation": 0,
 
   # defines model architecture
   "salt_col": "salt smiles", # matches column name in df
@@ -129,7 +129,7 @@ ffn_cv = {
   "conts": ["mw","molality","temperature_K"], # conts that are selected for modeling, include temp_K column even if using Arrhenius
   "temperature_name": "temperature_K",
   "fold_list":[0,1,2,3,4,5,6,7,8,9], 
-  "seed": 42,
+  "seed": 3,
   "device": "cuda",
   "num_polymer_features": 600, # 600 for polybert, 128 for morgan
   "num_salt_features": 128, # 768 for chemberta, 128 for morgan
@@ -140,7 +140,7 @@ ffn_cv = {
   "batch_size": 16, # cannot exceed 32 atm due to memory limits
   "accumulation_steps": 8,
   "hidden_size": 2048,
-  "num_hidden_layers": 3,
+  "num_hidden_layers": 2,
   "batchnorm": False, # Always keep False
   "dropout": 0.1,
   "activation_fn": "relu",
