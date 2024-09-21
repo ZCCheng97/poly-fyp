@@ -113,8 +113,8 @@ ffn_cv = {
   "data_dir_name": "data",
   "results_dir_name": "results",
   "models_dir_name": "models",
-  "input_data_name": "morgan_ffn_morgan_90_10_new.pickle",
-  "output_name": "morgan_ffn_morgan_90_10_new_2_seed3", # remember to not include .csv for this particular variable, used to name the model file also
+  "input_data_name": "chemberta_ffn_morgan_90_10_new.pickle",
+  "output_name": "chemberta_ffn_morgan_90_10_new_gradunfreeze_2048", # remember to not include .csv for this particular variable, used to name the model file also
   "modes": ["train","test"], # can be either "train", "test" or both
   "arrhenius": False,
   "regularisation": 0,
@@ -124,14 +124,14 @@ ffn_cv = {
   "salt_encoding": "morgan", # matches column name in df, use "chemberta_tokenizer" for encoding, "morgan" for fp, "" to omit using salt as a predictor
   "salt_model_name": '', # 'seyonec/ChemBERTa-zinc-base-v1' for Chemberta, blank if not using trained embeddings
   'poly_col': "long_smiles",# matches column name in df
-  "poly_encoding": "morgan", # matches column name in df, use "tokenizer" for encoding, "morgan" for fp
-  "poly_model_name": '', # 'kuelumbus/polyBERT' if using polyBERT, blank if not using trained embeddings
+  "poly_encoding": "tokenizer", # matches column name in df, use "tokenizer" for encoding, "morgan" for fp
+  "poly_model_name": 'seyonec/ChemBERTa-zinc-base-v1', # 'kuelumbus/polyBERT' if using polyBERT, blank if not using trained embeddings
   "conts": ["mw","molality","temperature_K"], # conts that are selected for modeling, include temp_K column even if using Arrhenius
   "temperature_name": "temperature_K",
   "fold_list":[0,1,2,3,4,5,6,7,8,9], 
-  "seed": 3,
+  "seed": 42,
   "device": "cuda",
-  "num_polymer_features": 128, # 600 for polybert, 128 for morgan
+  "num_polymer_features": 768, # 600 for polybert, 128 for morgan
   "num_salt_features": 128, # 768 for chemberta, 128 for morgan
   "num_continuous_vars": 3, # change to 2 if using Arrhenius mode, otherwise 3 cont variables
   "data_fraction": 1, # use something small like 0.01 if you want to do quick run for error checking
@@ -139,7 +139,7 @@ ffn_cv = {
   # tunable hyperparameters
   "batch_size": 16, # cannot exceed 32 atm due to memory limits
   "accumulation_steps": 8,
-  "hidden_size": 512,
+  "hidden_size": 2048,
   "num_hidden_layers": 2,
   "batchnorm": False, # Always keep False
   "dropout": 0.1,
@@ -147,16 +147,16 @@ ffn_cv = {
   "init_method": "glorot",
   "output_size": 1, # change to 2 if using Arrhenius mode, otherwise 1
   "freeze_layers": 12, # by default 12 layers in polyBERT
-  "encoder_init_lr" : 0.00001, # only passed to initialise_optimiser
+  "encoder_init_lr" : 1e-5, # only passed to initialise_optimiser
   "salt_freeze_layers": 12,
   "salt_encoder_init_lr": 1e-6, # only passed to initialise_optimiser
-  "lr": 0.00001,
+  "lr": 1e-5,
   'optimizer': "AdamW", # Use "AdamW_ratedecay_4_4_4" only if using encoders for either salt or polymer. 
   "scheduler": "ReduceLROnPlateau", # {"ReduceLROnPlateau", "LinearLR", "CosineLR"}
-  "unfreezing_steps": 1, # leave as 0 if not using gradual unfreezing
+  "unfreezing_steps": 5, # leave as 0 if not using gradual unfreezing
   "grad_clip": 1.0,
   'warmup_steps': 10, # Usually 6% for LinearLR, 3% of total training steps for CosineLR.
-  "epochs": 20,
+  "epochs": 25,
   }
 
 ffn_sweep = {
