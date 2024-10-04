@@ -43,11 +43,11 @@ xgb_cv = {
   "best_params": "", # leave blank to not use best wandb sweep, otherwise use "<entity>/<project>/<run_id>"
   "data_dir_name": "data",
   "results_dir_name": "results",
-  "input_data_name": "polybert_xgb_chemberta_80_20_new.pickle",
-  "output_name": "polybert_xgb_chemberta_80_20_new_seed42", # no suffix
-  # "seed_list":[42,3,34,43,83], 
-  "seed_list":[42], 
-  "verbose": False,
+  "input_data_name": "morgan_xgb_morgan_90_10_new.pickle",
+  "output_name": "morgan_xgb_morgan_90_10_new_seed83", # no suffix
+  # "seed_list":[42,3,43,62,83], 
+  "seed_list":[83], 
+  "verbose": True,
 }
 
 xgb_sweep = {
@@ -294,14 +294,15 @@ ffn_vis = {
   "results_dir_name": "results",
   "models_dir_name": "models",
   "input_data_name": "polybert_ffn_morgan_90_10_new.pickle",
-  "output_name": "polybert_ffn_morgan_90_10_new_seed42_clip", # "polybert_ffn_morgan_90_10_new_seed42_clip"
+  "output_names": ["polybert_ffn_morgan_90_10_new_gradunfreeze","polybert_ffn_morgan_90_10_new_seed42_clip"],
+
   # polybert_ffn_morgan_90_10_new_gradunfreeze
   "device": "cuda",
-  "fold":1, # fold idx: int
+  "fold":7, # fold idx: int
   "arrhenius": False,
-  "regularisation": 0,
-  "start_idx": 17,
-  "end_idx": 60,
+  "regularisation": 7,
+  "start_idx": 470,
+  "end_idx": 470,
 
   # defines model architecture
   "salt_col": "salt smiles", # matches column name in df
@@ -319,8 +320,8 @@ ffn_vis = {
   "data_fraction": 1, # use something small like 0.01 if you want to do quick run for error checking
 
   # tunable hyperparameters
-  "hidden_size": 2048,
-  "num_hidden_layers": 1,
+  "hidden_size": [1024,2048], # 2048 for frozen, 1024 for unfrozen
+  "num_hidden_layers": [2,1], # 1 for frozen, 2 for unfrozen.
   "batchnorm": False,
   "activation_fn": "relu",
   "init_method": "glorot",

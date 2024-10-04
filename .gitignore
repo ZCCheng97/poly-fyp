@@ -4,3 +4,6 @@ polyenv/
 models/
 results/
 polyenv3_11/
+graphs/
+*.ipynb
+*.csv

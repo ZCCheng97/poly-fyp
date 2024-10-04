@@ -33,8 +33,8 @@ def visualise(tabularsplit, args, trained_model_path, tokeniser) -> list:
     model.load_state_dict(cp["model_state_dict"])
 
     engine = Visualiser(model, args.device, tokeniser, args.arrhenius)
-    vis_record = engine(test_loader)
-    return vis_record
+    vis_record,vis_tuple = engine(test_loader)
+    return vis_record,vis_tuple
 
 def test_ffn(tabularsplit, args, trained_model_path) -> tuple:
 

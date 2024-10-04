@@ -52,7 +52,7 @@ class Visualiser:
                 # Filter out [PAD] tokens
                 filtered_tokens = [token for token in tokens if token != "[PAD]"]
                 filtered_attributions = [attributions_sum[i] for i in range(len(tokens)) if tokens[i] != "[PAD]"]
-
+                
                  # Create the visualization data record
                 vis_record.append(visualization.VisualizationDataRecord(
                     filtered_attributions, 
@@ -61,7 +61,8 @@ class Visualiser:
                     filtered_tokens, 
                     convergence_score=delta.cpu()
                 ))
-        return vis_record
+
+        return vis_record, (filtered_tokens, [t.item() for t in filtered_attributions])
 
 class Tester:
     def __init__(self, model, device,arrhenius=False):
