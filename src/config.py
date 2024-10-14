@@ -300,9 +300,9 @@ ffn_vis = {
   "device": "cuda",
   "fold":7, # fold idx: int
   "arrhenius": False,
-  "regularisation": 7,
-  "start_idx": 470,
-  "end_idx": 470,
+  "regularisation": 0,
+  "start_idx": 29,
+  "end_idx": 29,
 
   # defines model architecture
   "salt_col": "salt smiles", # matches column name in df
