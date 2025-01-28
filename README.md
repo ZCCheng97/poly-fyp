@@ -1,4 +1,8 @@
 # poly-fyp
+##
+Title: Ionic Conductivity Prediction of Solid Polymer Electrolytes Using Transformer Representations
+An Honours Project 1 (FYP) submitted to the School of Chemistry, Chemical Engineering and Biotechnology, Nanyang Technological University in partial fulfillment of the requirements for the degree of Bachelor of Science in Chemistry and Biological Chemistry.
+
 ## Setup
 ### Installing all dependencies:
 
